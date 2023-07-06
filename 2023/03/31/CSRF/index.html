@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="简介CSRF（Cross-Site Request Forgery）的全称是“跨站请求伪造”，也被称为“One Click Attack”或者“Session Riding”，通常缩写为CSRF或者XSRF。CSRF的中文名称尽管听起来像跨站脚本攻击（XSS），但它与XSS非常不同，并且攻击方式几乎相左。XSS利用站点内的信任用户，而CSRF则通过伪装来自受信任用户的请求来攻击受信任的网站。与XS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSRF">
+<meta property="og:url" content="http://example.com/2023/03/31/CSRF/index.html">
+<meta property="og:site_name" content="057lwq&#39;s Blog">
+<meta property="og:description" content="简介CSRF（Cross-Site Request Forgery）的全称是“跨站请求伪造”，也被称为“One Click Attack”或者“Session Riding”，通常缩写为CSRF或者XSRF。CSRF的中文名称尽管听起来像跨站脚本攻击（XSS），但它与XSS非常不同，并且攻击方式几乎相左。XSS利用站点内的信任用户，而CSRF则通过伪装来自受信任用户的请求来攻击受信任的网站。与XS">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/DVWA/3-1.png">
+<meta property="og:image" content="http://example.com/images/DVWA/3-2.png">
+<meta property="og:image" content="http://example.com/images/DVWA/3-3.png">
+<meta property="og:image" content="http://example.com/images/DVWA/3-4.png">
+<meta property="og:image" content="http://example.com/images/DVWA/3-5.png">
+<meta property="og:image" content="http://example.com/images/DVWA/3-6.png">
+<meta property="og:image" content="http://example.com/images/DVWA/3-7.png">
+<meta property="article:published_time" content="2023-03-30T16:02:45.000Z">
+<meta property="article:modified_time" content="2023-04-16T03:14:04.926Z">
+<meta property="article:author" content="lwq">
+<meta property="article:tag" content="DVWA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/DVWA/3-1.png">
+
+<link rel="canonical" href="http://example.com/2023/03/31/CSRF/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>CSRF | 057lwq's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">057lwq's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/31/CSRF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lwq">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="057lwq's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CSRF
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-03-31 00:02:45" itemprop="dateCreated datePublished" datetime="2023-03-31T00:02:45+08:00">2023-03-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-04-16 11:14:04" itemprop="dateModified" datetime="2023-04-16T11:14:04+08:00">2023-04-16</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>CSRF（Cross-Site Request Forgery）的全称是“跨站请求伪造”，也被称为“One Click Attack”或者“Session Riding”，通常缩写为CSRF或者XSRF。CSRF的中文名称尽管听起来像跨站脚本攻击（XSS），但它与XSS非常不同，并且攻击方式几乎相左。XSS利用站点内的信任用户，而CSRF则通过伪装来自受信任用户的请求来攻击受信任的网站。与XSS攻击相比，CSRF攻击往往不大流行（因此对其进行防范的资源也相当稀少）和难以防范，所以被认为比XSS更具危险性。</p>
+<span id="more"></span>
+
+<p>我们可以这么理解CSRF攻击：攻击者首先盗用了你的身份，然后以你的名义进行某些非法操作。CSRF能够使用你的账户发送邮件，获取你的敏感信息，甚至盗走你的账户购买商品等。CSRF攻击其实是利用了web中用户身份认证验证的一个漏洞：简单的身份验证仅仅能保证请求发自某个用户的浏览器，却不能保证请求本身是用户自愿发出的。与xss的区别是csrf是借助用户的权限完成攻击，攻击者并没有拿到权限；而xss是直接盗取用户权限去进行破坏。</p>
+<h1 id="攻击原理"><a href="#攻击原理" class="headerlink" title="攻击原理"></a>攻击原理</h1><p>1.用户C打开浏览器，访问受信任网站A，输入用户名和密码请求登录网站A；<br>2.在用户信息通过验证后，网站A产生Cookie信息并返回给浏览器，此时用户登录网站A成功，可以正常发送请求到网站A；<br>3.用户未退出网站A之前，在同一浏览器中，打开一个TAB页访问网站B；<br>4.网站B接收到用户请求后，返回一些攻击性代码，并发出一个请求要求访问第三方站点A；<br>5.浏览器在接收到这些攻击性代码后，根据网站B的请求，在用户不知情的情况下携带Cookie信息，向网站A发出请求。网站A并不知道该请求其6.实是由B发起的，所以会根据用户C的Cookie信息以C的权限处理该请求，导致来自网站B的恶意代码被执行。<br><img src="/images/DVWA/3-1.png" alt="1"><br>从上面的流程可以看出，想要达成CSRF攻击，必须达到两个基本条件：<br>（1）登录受信任站点A，并在本地生成Cookie。<br>（2）在不登出A的情况下，访问危急站点B。</p>
+<h1 id="CSRF分类"><a href="#CSRF分类" class="headerlink" title="CSRF分类"></a>CSRF分类</h1><ol>
+<li>GET型：<br>如果一个网站某个地方的功能，比如用户修改邮箱是通过GET请求进行修改的。如：&#x2F;user.php?id&#x3D;1&amp;email&#x3D;<a href="mailto:&#49;&#x32;&#51;&#64;&#49;&#x36;&#51;&#x2e;&#x63;&#111;&#x6d;">&#49;&#x32;&#51;&#64;&#49;&#x36;&#51;&#x2e;&#x63;&#111;&#x6d;</a> ，这个链接的意思是用户id&#x3D;1将邮箱修改为<a href="mailto:&#49;&#x32;&#x33;&#64;&#49;&#x36;&#51;&#46;&#x63;&#111;&#109;">&#49;&#x32;&#x33;&#64;&#49;&#x36;&#51;&#46;&#x63;&#111;&#109;</a>。当我们把这个链接修改为 &#x2F;user.php?id&#x3D;1&amp;email&#x3D;<a href="mailto:&#x61;&#x62;&#99;&#64;&#49;&#54;&#51;&#x2e;&#99;&#111;&#x6d;">&#x61;&#x62;&#99;&#64;&#49;&#54;&#51;&#x2e;&#99;&#111;&#x6d;</a> ，然后通过各种手段发送给被攻击者，诱使被攻击者点击我们的链接，当用户刚好在访问这个网站，他同时又点击了这个链接，那么悲剧发生了。这个用户的邮箱被修改为 <a href="mailto:&#97;&#x62;&#x63;&#x40;&#x31;&#54;&#x33;&#x2e;&#99;&#111;&#109;">&#97;&#x62;&#x63;&#x40;&#x31;&#54;&#x33;&#x2e;&#99;&#111;&#109;</a> 了<br>2.POST型：<br>在普通用户的眼中，点击网页-&gt;打开试看视频-&gt;购买视频是一个很正常的一个流程。可是在攻击者的眼中可以算正常，但又不正常的，当然不正常的情况下，是在开发者安全意识不足所造成的。攻击者在购买处抓到购买时候网站处理购买(扣除)用户余额的地址。比如：&#x2F;coures&#x2F;user&#x2F;handler&#x2F;25332&#x2F;buy.php 。通过提交表单，buy.php处理购买的信息，这里的25532为视频ID。那么攻击者现在构造一个链接，链接中包含以下内容<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=/coures/user/handler/25332/buy method=POST&gt;</span><br><span class="line">&lt;input type=&quot;text&quot; name=&quot;xx&quot; value=&quot;xx&quot; /&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line">&lt;script&gt; document.forms[0].submit(); &lt;/script&gt; </span><br></pre></td></tr></table></figure>
+当用户访问该页面后，表单会自动提交，相当于模拟用户完成了一次POST操作，自动购买了id为25332的视频，从而导致受害者余额扣除</li>
+</ol>
+<h1 id="Low"><a href="#Low" class="headerlink" title="Low"></a>Low</h1><p>先查看源码,发现以GET方式得到三个参数，change、password_new、password_conf。如果password_new和password_conf相同，那么更新数据库，并没有任何防CSRF的措施。这里我们有多重攻击方式，比如直接构造链接、构造短链接和构造攻击页面。</p>
+<h2 id="构造链接"><a href="#构造链接" class="headerlink" title="构造链接"></a>构造链接</h2><p><code>http://127.0.0.1/dvwa/vulnerabilities/csrf/?password_new=123456&amp;password_conf=123456&amp;Change=Change#</code><br>既然参数是GET方式传递的，那么我们可以直接在URL链接中设置参数，如果用户用登陆过该网站的浏览器（服务器会验证cookie）打开这个链接，那么将直接把参数传递给服务器，因为服务器并没有防CSRF的措施，所以直接可以攻击成功，密码将被改为123456。到那时如果用户在没有登陆过这个网站的浏览器上打开这个链接，并不会更改密码，而是跳转到登录界面。因为服务器在接受访问时，首先还要验证用户的cookie，如果浏览器上并没有之前登录留下的cookie，那攻击也就无法奏效。CSRF攻击的关键就是利用受害者的cookie向服务器发送伪造请求。</p>
+<h2 id="短链接"><a href="#短链接" class="headerlink" title="短链接"></a>短链接</h2><p>上面的攻击链接太明显的，参数直接就在URL中，这样很容易就会被识破，为了隐藏URL，可以使用生成短链接的方式来实现。就是将原链接转换等一个比较短的URL链接，打开短链接和打开原链接等价的。<br><img src="/images/DVWA/3-2.png" alt="1"></p>
+<h2 id="构造攻击页面"><a href="#构造攻击页面" class="headerlink" title="构造攻击页面"></a>构造攻击页面</h2><p>1、抓取更改密码的数据包，利用engagement tools生成CDRF PoC，访问点击提交之后就可以更改密码。<br><img src="/images/DVWA/3-3.png" alt="1"><br>2.复制生成的html代码即为我们需要的攻击页面代码。<br><img src="/images/DVWA/3-4.png" alt="1"><br>3、访问点击提交之后就可以更改密码。<br><img src="/images/DVWA/3-5.png" alt="1"></p>
+<h1 id="medium"><a href="#medium" class="headerlink" title="medium"></a>medium</h1><p>先查看源码，（正常如果我们想要知道有什么漏洞只能靠猜，但是现在我们有本地源代码，可以看一下）<br>比起low难度，多了一行：<br>if( eregi( $_SERVER[ ‘SERVER_NAME’ ], $_SERVER[ ‘HTTP_REFERER’ ] ) )<br>【 注：在php语言中int eregi(string pattern, string string)，译为<br>检查string函数中是否含有pattern，如果有返回True，反之False。】<br>stripos(a,b)返回 b 存在于 a，字符串开始的位置，字符串起始位置为0，如果未发现 b 则返回false。代码检查了保留变量HTTP_REFERER （http包头部的Referer字段的值，表示来源地址）是否包含SERVER_NAME（http包头部的 Host 字段表示要访问的主机名）。针对这一过滤规则，我们只要想办法绕过，那么我们后面的代码和low级别的基本都一样了，很容易实现CSRF攻击。由于我是本地phpstudy搭建的DVWA，所以http包中Host字段就是本机—127.0.0.1，而Referer字段就是本地搭建的DVWA页面的地址，故也包含127.0.0.1。所以这个对于本地搭建的DVWA是无效的，但是在现实场景中一般是不包含的，所以我们可以通过更改页面文件名来绕过stripos函数。<br>格式：http:&#x2F;&#x2F;攻击者服务器地址&#x2F;dvwa&#x2F;被攻击ip地址.html<br>我们只需要把我们构造的恶意页面文件名改为192.168.<strong>.</strong>.html，HTTP_REFERER就会包含192.168.<strong>.</strong>.html,就可以绕过stripos了。<br><img src="/images/DVWA/3-6.png" alt="1"></p>
+<h1 id="high"><a href="#high" class="headerlink" title="high"></a>high</h1><p>查看源码，发现加入了Anti-csrf token机制，由checkToken函数来实现，用户每次访问更改密码页面时，服务器会返回一个随机的token，之后每次向服务器发起请求，服务器会优先验证token，如果token正确，那么才会处理请求。所以我们在发起请求之前需要获取服务器返回的user_token，利用user_token绕过验证。这里我们可以使用burpsuit的CSRF Token Tracker插件可以直接绕过user_token验证。<br><img src="/images/DVWA/3-7.png" alt="1"><br>接下来和medium一样。</p>
+<h1 id="impossible"><a href="#impossible" class="headerlink" title="impossible"></a>impossible</h1><p>查看源码，发现加入了PDO预编译语句防止SQL注入，防止CSRF不仅用了token，还要求用户输入原密码，这样在不知道原密码的情况下就无法构造参数。因此，目前还无法破解。</p>
+<h1 id="CSRF防御"><a href="#CSRF防御" class="headerlink" title="CSRF防御"></a>CSRF防御</h1><h2 id="Set-Cookie-SameSite"><a href="#Set-Cookie-SameSite" class="headerlink" title="Set-Cookie:SameSite"></a>Set-Cookie:SameSite</h2><p>禁止第三方网站带Cookies，可以在响应头Set-Cookie设置SameSite属性，表示Cookie为同源网站而非第三方网站。</p>
+<h2 id="验证码校验或CSRF-Token"><a href="#验证码校验或CSRF-Token" class="headerlink" title="验证码校验或CSRF Token"></a>验证码校验或CSRF Token</h2><p>在请求地址中添加token验证或者验证码校验，验证码和CSRF Token都具有随机性。缺点就是可能会降低用户体验。</p>
+<h2 id="验证HTTP-Referer字段"><a href="#验证HTTP-Referer字段" class="headerlink" title="验证HTTP Referer字段"></a>验证HTTP Referer字段</h2><p>Referer字段表示http请求的来源地址，服务器对每一个请求验证Referer值，查看请求来源是否合法，可以在一定程度上防御CSRF攻击。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/DVWA/" rel="tag"># DVWA</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/03/30/Command%20Injection/" rel="prev" title="Command Injection">
+      <i class="fa fa-chevron-left"></i> Command Injection
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/04/10/Fileupload/" rel="next" title="File upload">
+      File upload <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">攻击原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CSRF%E5%88%86%E7%B1%BB"><span class="nav-number">3.</span> <span class="nav-text">CSRF分类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Low"><span class="nav-number">4.</span> <span class="nav-text">Low</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E9%93%BE%E6%8E%A5"><span class="nav-number">4.1.</span> <span class="nav-text">构造链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9F%AD%E9%93%BE%E6%8E%A5"><span class="nav-number">4.2.</span> <span class="nav-text">短链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E6%94%BB%E5%87%BB%E9%A1%B5%E9%9D%A2"><span class="nav-number">4.3.</span> <span class="nav-text">构造攻击页面</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#medium"><span class="nav-number">5.</span> <span class="nav-text">medium</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#high"><span class="nav-number">6.</span> <span class="nav-text">high</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#impossible"><span class="nav-number">7.</span> <span class="nav-text">impossible</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CSRF%E9%98%B2%E5%BE%A1"><span class="nav-number">8.</span> <span class="nav-text">CSRF防御</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Set-Cookie-SameSite"><span class="nav-number">8.1.</span> <span class="nav-text">Set-Cookie:SameSite</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81%E7%A0%81%E6%A0%A1%E9%AA%8C%E6%88%96CSRF-Token"><span class="nav-number">8.2.</span> <span class="nav-text">验证码校验或CSRF Token</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81HTTP-Referer%E5%AD%97%E6%AE%B5"><span class="nav-number">8.3.</span> <span class="nav-text">验证HTTP Referer字段</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lwq</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lwq</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

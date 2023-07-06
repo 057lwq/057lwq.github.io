@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Pass-1看到任务是上传一个文件，所以先创建一个写有一句话木马的文件命名 1.php">
+<meta property="og:type" content="article">
+<meta property="og:title" content="upload-labs 1~21">
+<meta property="og:url" content="http://example.com/2023/03/23/upload-labs/index.html">
+<meta property="og:site_name" content="057lwq&#39;s Blog">
+<meta property="og:description" content="Pass-1看到任务是上传一个文件，所以先创建一个写有一句话木马的文件命名 1.php">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/upload/1-1.jpg">
+<meta property="og:image" content="http://example.com/images/upload/1-2.jpg">
+<meta property="og:image" content="http://example.com/images/upload/1-3.jpg">
+<meta property="og:image" content="http://example.com/images/upload/1-4.jpg">
+<meta property="og:image" content="http://example.com/images/upload/2-1.jpg">
+<meta property="og:image" content="http://example.com/images/upload/2-2.jpg">
+<meta property="og:image" content="http://example.com/images/upload/2-3.jpg">
+<meta property="og:image" content="http://example.com/images/upload/3-1.jpg">
+<meta property="og:image" content="http://example.com/images/upload/3-2.jpg">
+<meta property="og:image" content="http://example.com/images/upload/4-1.jpg">
+<meta property="og:image" content="http://example.com/images/upload/4-2.jpg">
+<meta property="og:image" content="http://example.com/images/upload/7-1.jpg">
+<meta property="og:image" content="http://example.com/images/upload/8.jpg">
+<meta property="og:image" content="http://example.com/images/upload/9.jpg">
+<meta property="og:image" content="http://example.com/images/upload/10.jpg">
+<meta property="og:image" content="http://example.com/images/upload/11.jpg">
+<meta property="og:image" content="http://example.com/images/upload/12.jpg">
+<meta property="og:image" content="http://example.com/images/upload/13-1.jpg">
+<meta property="og:image" content="http://example.com/images/upload/13-2.jpg">
+<meta property="og:image" content="http://example.com/images/upload/13-3.jpg">
+<meta property="og:image" content="http://example.com/images/upload/14-5.jpg">
+<meta property="og:image" content="http://example.com/images/upload/14-1.jpg">
+<meta property="og:image" content="http://example.com/images/upload/14-2.jpg">
+<meta property="og:image" content="http://example.com/images/upload/14-4.jpg">
+<meta property="og:image" content="http://example.com/images/upload/14-3.jpg">
+<meta property="og:image" content="http://example.com/images/upload/17-1.gif">
+<meta property="og:image" content="http://example.com/images/upload/17-2.jpg">
+<meta property="og:image" content="http://example.com/images/upload/18-5.jpg">
+<meta property="og:image" content="http://example.com/images/upload/18-1.jpg">
+<meta property="og:image" content="http://example.com/images/upload/18-2.jpg">
+<meta property="og:image" content="http://example.com/images/upload/18-3.jpg">
+<meta property="og:image" content="http://example.com/images/upload/18-4.jpg">
+<meta property="og:image" content="http://example.com/images/upload/19-1.jpg">
+<meta property="og:image" content="http://example.com/images/upload/19-2.jpg">
+<meta property="og:image" content="http://example.com/images/upload/19-2.jpg">
+<meta property="og:image" content="http://example.com/images/upload/19-3.jpg">
+<meta property="og:image" content="http://example.com/images/upload/19-4.jpg">
+<meta property="og:image" content="http://example.com/images/upload/20-1.jpg">
+<meta property="og:image" content="http://example.com/images/upload/21-1.jpg">
+<meta property="og:image" content="http://example.com/images/upload/21-2.jpg">
+<meta property="article:published_time" content="2023-03-23T13:18:07.000Z">
+<meta property="article:modified_time" content="2023-04-05T13:37:10.017Z">
+<meta property="article:author" content="lwq">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/upload/1-1.jpg">
+
+<link rel="canonical" href="http://example.com/2023/03/23/upload-labs/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>upload-labs 1~21 | 057lwq's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">057lwq's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/03/23/upload-labs/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lwq">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="057lwq's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          upload-labs 1~21
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-03-23 21:18:07" itemprop="dateCreated datePublished" datetime="2023-03-23T21:18:07+08:00">2023-03-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-04-05 21:37:10" itemprop="dateModified" datetime="2023-04-05T21:37:10+08:00">2023-04-05</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Pass-1"><a href="#Pass-1" class="headerlink" title="Pass-1"></a>Pass-1</h1><p>看到任务是上传一个文件，所以先创建一个写有一句话木马的文件命名 1.php</p>
+<span id="more"></span>
+<p><code>&lt;?php @eval($_POST[&#39;pass1&#39;]);?&gt;</code><br>上传失败，弹窗提示文件后缀不对。而弹窗进行错误提示说明是进行前端验证。<br><img src="/images/upload/1-1.jpg" alt="1"></p>
+<h2 id="方法1"><a href="#方法1" class="headerlink" title="方法1"></a>方法1</h2><p>所以我们可以利用bp抓包来绕过前端验证，先把文件后缀改成.jpg上传，利用bp抓包。将文件后缀改为.php放包。<br><img src="/images/upload/1-2.jpg" alt="1"><br>发现上传成功了，接下来就可以用蚁剑连接了。<br><img src="/images/upload/1-3.jpg" alt="1"></p>
+<h2 id="方法2"><a href="#方法2" class="headerlink" title="方法2"></a>方法2</h2><p>直接在用Firefox的插件禁用js也可<br><img src="/images/upload/1-4.jpg" alt="1"><br>这一关学习了几个JavaScript函数<br><code>var element = document.getElementById(id)</code><br>Document的方法 getElementById()返回一个匹配特定 ID的元素。element 是一个 Element 对象。如果当前文档中拥有特定 ID 的元素不存在则返回 null。<br>id 是大小写敏感的字符串，代表了所要查找的元素的唯一 ID。匹配成功返回一个匹配到 ID 的 DOM Element 对象。若在当前 Document 下没有找到，则返回 null。<br><code>substring(起始索引,结束索引)</code><br>substring(起始索引,结束索引) 方法从字符串中提取两个索引（位置）之间的字符，并返回子字符串。<br><code>indexOf() </code><br>indexOf() 方法返回值在字符串中第一次出现的位置。如果未找到该值，则 indexOf() 方法返回 -1。<br><code>lastIndexOf()</code><br>lastIndexOf() 方法返回字符串中指定值最后一次出现的索引（下标）,从尾到头搜索字符串,从开头（位置 0）返回索引。如果未找到该值，则 lastIndexOf() 方法返回 -1。</p>
+<h1 id="Pass-2"><a href="#Pass-2" class="headerlink" title="Pass-2"></a>Pass-2</h1><p>上传一个写有一句话木马的php文件，出现了提示。<br><img src="/images/upload/2-1.jpg" alt="1"><br>错误是在页面直接回显，所以不是前端验证。查看源码发现上传文件的途中验证了content-type，并且固定了可以上传的文件类型。先学习一下content-type的相关内容。<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/danielzhou888/article/details/72861097">https://blog.csdn.net/danielzhou888/article/details/72861097</a></p>
+<h2 id="方法1-1"><a href="#方法1-1" class="headerlink" title="方法1"></a>方法1</h2><p>接下来用bp抓包<br><img src="/images/upload/2-2.jpg" alt="1"><br>将Content-Type修改为 image&#x2F;png，放包后文件就上传成功了，使用蚁剑连接就行了。</p>
+<h2 id="方法2-1"><a href="#方法2-1" class="headerlink" title="方法2"></a>方法2</h2><p>将文件 2.php 改为2.jpg，上传并使用bp抓包。<br><img src="/images/upload/2-3.jpg" alt="1"><br>将filename的值改为2.php，然后放包即可。</p>
+<h1 id="Pass-3"><a href="#Pass-3" class="headerlink" title="Pass-3"></a>Pass-3</h1><p>上传一个写有一句话木马的php文件，出现了提示。<br><img src="/images/upload/3-1.jpg" alt="1"><br>查看源代码发现设定了黑名单，’.asp’,’.aspx’,’.php’,’.jsp’后缀的文件都不允许上传，并且会检查大小写、删除点和空格。</p>
+<h2 id="方法1-2"><a href="#方法1-2" class="headerlink" title="方法1"></a>方法1</h2><p>想要绕过黑名单可以使用脚本的其他拓展名。列举一些php文件的其他拓展名。.php .phtml .phps .php5 .pht<br>但是我尝试失败了，上网查了很久，原因是php版本太高了，需要不带nts的php。</p>
+<h2 id="方法2-2"><a href="#方法2-2" class="headerlink" title="方法2"></a>方法2</h2><p>上传文件 3.php，并用bp抓包,将filename改为 3.php::$DA::$DATATA，放包后文件上传成功<br><img src="/images/upload/3-2.jpg" alt="1"><br>原理：trim和deldot函数可以删掉连续的多个空格和点，但str_ireplace函数只能替换一个::$DATA，所以可以双写绕过。</p>
+<h1 id="Pass-4"><a href="#Pass-4" class="headerlink" title="Pass-4"></a>Pass-4</h1><p>还是先尝试上传一个文件，失败了。查看源码，<br><img src="/images/upload/4-1.jpg" alt="1"></p>
+<h2 id="方法1-3"><a href="#方法1-3" class="headerlink" title="方法1"></a>方法1</h2><p>发现黑名单中限制了很多后缀，但是没有.htaccess，我们可以上传.htaccess文件更改apache配置<br>原理：.htaccess文件(或者”分布式配置文件”）,全称是Hypertext Access(超文本入口)。提供了针对目录改变配置的方法， 即，在一个特定的文档目录中放置一个包含一个或多个指令的文件， 以作用于此目录及其所有子目录。作为用户，所能使用的命令受到限制。管理员可以通过Apache的AllowOverride指令来设置。<br>创建一个.htaccess文件，如下<br><img src="/images/upload/4-2.jpg" alt="1"><br>再创建一个php文件写入一句话木马，文件改名为muma.jpg<br>然后先上传 .htaccess 文件 , 该文件可使其所在目录下的所有文件以php文件执行<br>再上传 muma.jpg 文件 , 此文件会被当做php文件执行<br>但是我在尝试过程中，蚁剑无法连接上木马。查了一下，原因还是php版本太高了，需要没有nts的php版本。我就不再改版本尝试了。</p>
+<h2 id="方法2-3"><a href="#方法2-3" class="headerlink" title="方法2"></a>方法2</h2><p>先进行代码审计，发现过滤函数是在文件上传后先删除文件末尾的点，然后去除首尾的空格，再去除字符串::$DATA。所以我们在bp里将文件后缀改为<code>.php. .</code>（点 空格 点）。首先去掉最后一个点，然后去掉空格，因为只执行1此，所以还剩下.php.，上传成功。</p>
+<h1 id="Pass-5"><a href="#Pass-5" class="headerlink" title="Pass-5"></a>Pass-5</h1><p>查看源码发现它把所有后缀名都写死了，并且大小写，空格，点号，.htaccess文件等都不行了。<br>反复观察发现.ini文件没有被限制。先学习一下有关.ini的知识</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">user.ini ： 自 PHP 5.3.0 起，PHP 支持基于每个目录的 .htaccess 风格的 INI 文件。此类文件仅被</span><br><span class="line">   CGI／FastCGI SAPI 处理。此功能使得 PECL 的 htscanner 扩展作废。如果使用 Apache，则用</span><br><span class="line">   .htaccess 文件有同样效果。</span><br><span class="line">   </span><br><span class="line">   除了主 php.ini 之外，PHP 还会在每个目录下扫描 INI 文件，从被执行的 PHP 文件所在目录开始一直上升到 web</span><br><span class="line">   根目录（$_SERVER[&#x27;DOCUMENT_ROOT&#x27;] 所指定的）。如果被执行的 PHP 文件在 web 根目录之外，则只扫描该目录。</span><br><span class="line">   </span><br><span class="line">   在 .user.ini 风格的 INI 文件中只有具有 PHP_INI_PERDIR 和 PHP_INI_USER 模式的 INI</span><br><span class="line">   设置可被识别。</span><br><span class="line">   </span><br><span class="line">   两个新的 INI 指令，user_ini.filename 和 user_ini.cache_ttl 控制着用户 INI 文件的使用。</span><br><span class="line">   </span><br><span class="line">   user_ini.filename 设定了 PHP 会在每个目录下搜寻的文件名；如果设定为空字符串则 PHP 不会搜寻。默认值是</span><br><span class="line">   .user.ini。</span><br><span class="line">   </span><br><span class="line">   user_ini.cache_ttl 控制着重新读取用户 INI 文件的间隔时间。默认是 300 秒（5 分钟）。</span><br></pre></td></tr></table></figure>
+<p>php.ini 是 php的配置文件，.user.ini 中的字段也会被 php 视为配置文件来处理，从而导致 php 的文件解析漏洞。</p>
+<p>但是想要引发 .user.ini 解析漏洞需要三个前提条件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">服务器使用CGI／FastCGI模式  </span><br><span class="line"></span><br><span class="line">上传目录下要有可执行的php文件</span><br></pre></td></tr></table></figure>
+<h2 id="方法1-4"><a href="#方法1-4" class="headerlink" title="方法1"></a>方法1</h2><p>创建一个.user.ini文件并写入<code>auto_prepend_file=5.jpg</code><br>这句话的意思是所有的php文件都自动包含666.jpg文件。.user.ini相当于一个用户自定义的php.ini<br>接下来上传写有一句话木马的5.jpg文件，接下来用蚁剑连接readme.php文件即可。</p>
+<h2 id="方法2-4"><a href="#方法2-4" class="headerlink" title="方法2"></a>方法2</h2><p>用bp抓包，将文件名改为5.php. . (点 空格 点)也可上传成功。</p>
+<h1 id="Pass-6"><a href="#Pass-6" class="headerlink" title="Pass-6"></a>Pass-6</h1><p>查看源码，这一关还是黑名单验证，但是发现它没有使用trtolower($file_ext)函数，即<br>将代码转换成小写，所以我们可以将文件后缀改为大小写混合即可上传成功，使用蚁剑连接即可。</p>
+<h1 id="Pass-7"><a href="#Pass-7" class="headerlink" title="Pass-7"></a>Pass-7</h1><p>查看源码，发现没有使用trim()去除空格，所以可以使用空格绕过黑名单。上传文件并使用bp抓包。<br><img src="/images/upload/7-1.jpg" alt="1"><br>在红框处加一个空格再放包，即可上传成功。</p>
+<h1 id="Pass-8"><a href="#Pass-8" class="headerlink" title="Pass-8"></a>Pass-8</h1><p>查看源码，发现没有使用deldot()过滤文件名末尾的点，可以使用文件名后加.进行绕过黑名单<br><img src="/images/upload/8.jpg" alt="1"></p>
+<h1 id="Pass-9"><a href="#Pass-9" class="headerlink" title="Pass-9"></a>Pass-9</h1><p>查看源码，发现没有对::DATA进 行 处 理 ,可以使用::DATA绕过黑名单<br><img src="/images/upload/9.jpg" alt="1"><br>在window的时候如果文件名+”::$DATA”会把::$DATA之后的数据当成文件流处理,不会检测后缀名，且保持::$DATA之前的文件名，他的目的就是不检查后缀名</p>
+<h1 id="Pass-10"><a href="#Pass-10" class="headerlink" title="Pass-10"></a>Pass-10</h1><p>这一关黑名单，最后上传路径直接使用文件名进行拼接，而且只对文件名进行filename&#x3D;deldot(file_name)操作去除文件名末尾的点，我们理解代码的含义，发现首先会去处文件名末尾的点，然后首尾去空。我们可以利用这样的检验机制，首先我们在文件后缀名后添加一个点，但是因为存在去除文件名末尾的点的代码，所以我们需要不止一个点，注意我们用来绕过黑名单的点显然不能够被消除，所以要在他后面放一个东西防止他落在最后一位。我们看到收尾去空的代码在去点代码之后，所以用空格来充当占位符号。最终‘test.php’改写为’test.php. .’，即可实现绕过黑名单。<br><img src="/images/upload/10.jpg" alt="1"></p>
+<h1 id="Pass-11"><a href="#Pass-11" class="headerlink" title="Pass-11"></a>Pass-11</h1><p>观察源码，发现使用str_ireplace()函数寻找文件名中存在的黑名单字符串，将它替换成空（即将它删掉），利用这一特点，我们可以进行双写后缀名操作，即加一个后缀名让他替换掉，如‘11.php’改写为’11.pphphp’当后缀名被替换掉后会变成空格，可以绕过黑名单的检测，但是存储时空格会被去掉，最后剩下的文件后缀名合并为’11.php’。<br>上传文件11.php文件，bp抓包，修改为 11.pphphp，使用蚁剑连接。<br><img src="/images/upload/11.jpg" alt="1"></p>
+<h1 id="Pass-12"><a href="#Pass-12" class="headerlink" title="Pass-12"></a>Pass-12</h1><p>这一关白名单，最终文件的存放位置是以拼接的方式，可以使用%00截断</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">0x00，%00这两类截断都是属于同种原理，%00在url解码后为空字符，0X00即16进制的00。在解析后这两个内容都会被当做chr(0)来处理。</span><br><span class="line">chr()函数的作用：返回括号中的参数所代表的字符。</span><br><span class="line">chr(0)代表的含义是返回ASCII码中0代表的字符，也就是NULL。</span><br><span class="line">当一个字符串中存在空字符的时候，在被解析的时候会导致空字符后面的字符被丢弃。</span><br><span class="line">而当传参方式为GET则需要使用%00，因为GET传参时url会自动编码，转移为空字符；而POST型传参时则不会进行自动编码，所以需要使用0x00进行截断。</span><br></pre></td></tr></table></figure>
+<p>00截断的使用条件：<br>（1）php版本要小于5.3.4。<br>（2）文件路径可控。<br>（3）magic_quotes_gpc需要为OFF状态。（在php.ini中）<br>上传12.php用BP抓包修改参数，把upload&#x2F;后面加上12.php%00，下面的filename&#x3D;”12.php”改为12.png<br><img src="/images/upload/12.jpg" alt="1"></p>
+<h1 id="Pass-13"><a href="#Pass-13" class="headerlink" title="Pass-13"></a>Pass-13</h1><p>这一关白名单，文件上传路径拼接生成，而且使用了post发送的数据进行拼接，我们可以控制post数据进行0x00截断绕过白名单。上传文件并用bp抓包，upload&#x2F;后面加上13.php+，下面的filename&#x3D;”13.php”改为13.png<br><img src="/images/upload/13-1.jpg" alt="1"><br>+号的Hex是2b，这里我们要把它改为00<br><img src="/images/upload/13-2.jpg" alt="1"> <img src="/images/upload/13-3.jpg" alt="1"></p>
+<h1 id="Pass-14"><a href="#Pass-14" class="headerlink" title="Pass-14"></a>Pass-14</h1><p><img src="/images/upload/14-5.jpg" alt="1"><br>本关在检测程序中都有对应的函数来检测上传的文件是否为一个真实的图片文件，且需要利用文件包含漏洞或者文件解析漏洞来使上传的文件进行解析。读取判断上传文件的前两个字节，判断上传文件类型，并且后端会根据判断得到的文件类型重命名上传文件使用 图片马+文件包含 绕过。图片一句话木马即携带一句话木马的图片，外表上是一个正常的图片，但图片的编码中携带了一句话木马，当存在含文件包含或者文件解析漏洞的时候，便可以将图片解析为可执行文件，执行其中的一句话木马。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">补充知识：</span><br><span class="line">1.Png图片文件包括8字节：89 50 4E 47 0D 0A 1A 0A。即为 .PNG。</span><br><span class="line">2.Jpg图片文件包括2字节：FF D8。</span><br><span class="line">3.Gif图片文件包括6字节：47 49 46 38 39|37 61 。即为 GIF89(7)a。</span><br><span class="line">4.Bmp图片文件包括2字节：42 4D。即为 BM。</span><br></pre></td></tr></table></figure>
+<p>图片一句话木马的制作：<br><code>copy a.jpg/b+ b.php c.jpg</code><br>&#x2F;b，即二进制，该命令表示以二进制格式合并a.jpg和b.php。其中a.jpg为正常图片，b.php中写的一句话木马，c.jpg为生成的图片一句话木马。<br>cmd使用 copy a.png&#x2F;b + 14.php pass14.png 制作图片马，上传图片马<br><img src="/images/upload/14-1.jpg" alt="1"><br>但是图片一直上传失败，后面一直尝试发现貌似要一张真的照片才行。<br>然后这关要使用文件包含才能解析木马的执行，文件包含页面链接就在首页上。<br><img src="/images/upload/14-2.jpg" alt="1"><br>然后用蚁剑连接这个地址就行了。<br>但在尝试的时候发现有些图片不能使用<br>如：<img src="/images/upload/14-4.jpg" alt="1"><br>图片解析失败<br><img src="/images/upload/14-3.jpg" alt="1"><br>不知道为什么。所以用简单一点的图片就好了，像纯白色的图片。</p>
+<h1 id="Pass-15"><a href="#Pass-15" class="headerlink" title="Pass-15"></a>Pass-15</h1><p>查看源码，发现这关使用的是getimagesize($filename)函数，<br><code>getimagesize() 函数将测定任何 GIF，JPG，PNG，SWF，SWC，PSD，TIFF，BMP，IFF，JP2，JPX，JB2，JPC，XBM 或 WBMP 图像文件的大小并返回图像的尺寸以及文件类型及图片高度与宽度。</code><br>所以使用pass-14的图片木马上传也可成功，方法也一样。</p>
+<h1 id="Pass-16"><a href="#Pass-16" class="headerlink" title="Pass-16"></a>Pass-16</h1><p>这关要先配置服务器，<a target="_blank" rel="noopener" href="https://www.xp.cn/b.php/108635.html">https://www.xp.cn/b.php/108635.html</a><br>exif_imagetype() 读取一个图像的第一个字节并检查其签名。如果发现了恰当的签名则返回一个对应的常量，否则返回 FALSE。返回值跟getimagesize() 返回的数组中的索引 2 的值是一样的，但exif_imagetype函数快得多。需要开启php_exif模块。<br>接下来和pass-14一样。</p>
+<h1 id="Pass-17"><a href="#Pass-17" class="headerlink" title="Pass-17"></a>Pass-17</h1><p>这一关对上传图片进行了判断了后缀名、content-type，以及利用imagecreatefromgif判断是否为gif图片，最后再做了一次二次渲染，但是后端二次渲染需要找到渲染后的图片里面没有发生变化的Hex地方，添加一句话，通过文件包含漏洞执行一句话，使用蚁剑进行连接。<br>源码分析</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line">$msg = null;</span><br><span class="line">if (isset($_POST[&#x27;submit&#x27;]))&#123;</span><br><span class="line">    // 获得上传文件的基本信息，文件名，类型，大小，临时文件路径</span><br><span class="line">    $filename = $_FILES[&#x27;upload_file&#x27;][&#x27;name&#x27;];</span><br><span class="line">    $filetype = $_FILES[&#x27;upload_file&#x27;][&#x27;type&#x27;];</span><br><span class="line">    $tmpname = $_FILES[&#x27;upload_file&#x27;][&#x27;tmp_name&#x27;];</span><br><span class="line"></span><br><span class="line">    $target_path=UPLOAD_PATH.&#x27;/&#x27;.basename($filename);  //basename函数返回路径中的文件名部分。</span><br><span class="line"></span><br><span class="line">    // 获得上传文件的扩展名</span><br><span class="line">    $fileext= substr(strrchr($filename,&quot;.&quot;),1);</span><br><span class="line"></span><br><span class="line">    //判断文件后缀与类型，合法才进行上传操作</span><br><span class="line">    if(($fileext == &quot;jpg&quot;) &amp;&amp; ($filetype==&quot;image/jpeg&quot;))&#123;   //对文件扩展名和mime类型做了判断</span><br><span class="line">        if(move_uploaded_file($tmpname,$target_path))&#123;</span><br><span class="line">            //使用上传的图片生成新的图片</span><br><span class="line">            $im = imagecreatefromjpeg($target_path); //imagecreatefromjpeg()函数由jpeg文件或URL创建一个新图象。</span><br><span class="line"></span><br><span class="line">            if($im == false)&#123;</span><br><span class="line">                $msg = &quot;该文件不是jpg格式的图片！&quot;;</span><br><span class="line">                @unlink($target_path);   //删除图片</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                //给新图片指定文件名</span><br><span class="line">                srand(time());  //srand()随机数种子生成器</span><br><span class="line">                $newfilename = strval(rand()).&quot;.jpg&quot;;  //strval()获取变量的字符串值</span><br><span class="line">                //显示二次渲染后的图片（使用用户上传图片生成的新图片）</span><br><span class="line">                $img_path = UPLOAD_PATH.&#x27;/&#x27;.$newfilename;</span><br><span class="line">                imagejpeg($im,$img_path);  //输出图象到浏览器或文件。</span><br><span class="line">                @unlink($target_path);   //删除原来图片</span><br><span class="line">                $is_upload = true;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            $msg = &quot;上传出错！&quot;;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;else if(($fileext == &quot;png&quot;) &amp;&amp; ($filetype==&quot;image/png&quot;))&#123;</span><br><span class="line">        if(move_uploaded_file($tmpname,$target_path))&#123;</span><br><span class="line">            //使用上传的图片生成新的图片</span><br><span class="line">            $im = imagecreatefrompng($target_path);</span><br><span class="line"></span><br><span class="line">            if($im == false)&#123;</span><br><span class="line">                $msg = &quot;该文件不是png格式的图片！&quot;;</span><br><span class="line">                @unlink($target_path);</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                 //给新图片指定文件名</span><br><span class="line">                srand(time());</span><br><span class="line">                $newfilename = strval(rand()).&quot;.png&quot;;</span><br><span class="line">                //显示二次渲染后的图片（使用用户上传图片生成的新图片）</span><br><span class="line">                $img_path = UPLOAD_PATH.&#x27;/&#x27;.$newfilename;</span><br><span class="line">                imagepng($im,$img_path);</span><br><span class="line"></span><br><span class="line">                @unlink($target_path);</span><br><span class="line">                $is_upload = true;               </span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            $msg = &quot;上传出错！&quot;;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;else if(($fileext == &quot;gif&quot;) &amp;&amp; ($filetype==&quot;image/gif&quot;))&#123;</span><br><span class="line">        if(move_uploaded_file($tmpname,$target_path))&#123;</span><br><span class="line">            //使用上传的图片生成新的图片</span><br><span class="line">            $im = imagecreatefromgif($target_path);</span><br><span class="line">            if($im == false)&#123;</span><br><span class="line">                $msg = &quot;该文件不是gif格式的图片！&quot;;</span><br><span class="line">                @unlink($target_path);</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                //给新图片指定文件名</span><br><span class="line">                srand(time());</span><br><span class="line">                $newfilename = strval(rand()).&quot;.gif&quot;;</span><br><span class="line">                //显示二次渲染后的图片（使用用户上传图片生成的新图片）</span><br><span class="line">                $img_path = UPLOAD_PATH.&#x27;/&#x27;.$newfilename;</span><br><span class="line">                imagegif($im,$img_path);</span><br><span class="line"></span><br><span class="line">                @unlink($target_path);</span><br><span class="line">                $is_upload = true;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            $msg = &quot;上传出错！&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        $msg = &quot;只允许上传后缀为.jpg|.png|.gif的图片文件！&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>后端对上传的图片先进行后缀和mime的校验，若通过则会将图片二次渲染，也就是说如果我们在图片中插入php代码，经过二次渲染后php代码很可能会丢失。<br>首先上传一张图片<br><img src="/images/upload/17-1.gif" alt="1"><br>使用010 Editor编辑器比较上传前和上传后图片的hex，选择没有变化的地方替换成一句话木马，注意字符数要一样，保存更改的照片再上传。<br><img src="/images/upload/17-2.jpg" alt="1"><br>接下来使用文件包含即可使用蚁剑连接了。<br>或者在bp上抓包直接更改再上传也可以，bp上也有工具可以比较两张图片。但是010 Editor更方便一点。<br>在我的尝试中，之前把一句话木马插在靠后的位置一直出问题，插在靠前的的位置容易成功，不知道为什么。</p>
+<h1 id="Pass-18"><a href="#Pass-18" class="headerlink" title="Pass-18"></a>Pass-18</h1><p>点击提示说要进行代码审计，查看源代码后，知道服务器先是将上传的文件保存下来，然后将文件的后缀名同白名单对比，如果是jpg、png、gif中的一种，就将文件进行重命名。如果不符合的话，unlink()函数就会删除该文件。<br>上传一个写入木马的php文件18.php，抓取数据包，对此数据包进行多线程高并发的重放。<br><img src="/images/upload/18-5.jpg" alt="1"><br>与此同时，用python不断的请求文件18.php。<br><img src="/images/upload/18-1.jpg" alt="1"><br>由于多线程高并发的重放上传18.php文件，所以一定会存在上传成功但还未来得及删除的18.php文件使得python请求成功，一旦请求成功则会在本地写入木马。<br><img src="/images/upload/18-2.jpg" alt="1"><br><img src="/images/upload/18-3.jpg" alt="1"><br><img src="/images/upload/18-4.jpg" alt="1"><br>用蚁剑连接即可getshell。</p>
+<h1 id="Pass-19"><a href="#Pass-19" class="headerlink" title="Pass-19"></a>Pass-19</h1><p>这里有一个细节，由于可能是这个靶场的作者的某种原因可能有误，上传的图片路径不是放在upload文件夹下，所以我们要进去修改一下第19关的代码文件<br><img src="/images/upload/19-1.jpg" alt="1"><br>在Myupload类中的Upload方法中对上传的文件进行白名单后缀过滤、判断文件大小的合法性、对上传的文件改名。也就是说只有绕过了后缀的白名单的过滤，才会保存文件。这里注意，保存文件后会对文件进行改名操作了，比如上传了shell.php.xxx，他会对shell.php进行改名。我们要利用的就是apache的解析漏洞结合条件竞争，在上传成功之后和改名之前的时间差内对shell.php.xxx发起访问，使得木马文件写入目录中<br>将第18关的木马做成图片木马。<br>上传图片马，用BP拦截（基本上在BP上的操作跟上面第18关没区别）<br>写python脚本<br><img src="/images/upload/19-2.jpg" alt="1"><br>接下来我们可以用BP进行攻击，并同时运行python脚本<br><img src="/images/upload/19-2.jpg" alt="1"><br><img src="/images/upload/19-3.jpg" alt="1"><br>注意：生成的木马和include.php在一个目录下。<br><img src="/images/upload/19-4.jpg" alt="1"><br>使用蚁剑连接时要注意文件路径。</p>
+<h1 id="Pass-20"><a href="#Pass-20" class="headerlink" title="Pass-20"></a>Pass-20</h1><p>本关没有对上传的文件做判断，只对用户输入的文件名做判断。<br>出现了一个新函数move_uploaded_file()<br>这个函数的作用是将上传的文件移动到新位置。move_uploaded_file()还有这么一个特性，会忽略掉文件末尾的 &#x2F;.<br>上传一句话木马，使用bp抓包，将upload-19.jpg改为upload-19.php&#x2F;.即可<br><img src="/images/upload/20-1.jpg" alt="1"><br>或者直接修改保存名称为upload-19.php&#x2F;.</p>
+<h1 id="Pass-21"><a href="#Pass-21" class="headerlink" title="Pass-21"></a>Pass-21</h1><p>这一关白名单<br>验证过程：<br>–&gt; 验证上传路径是否存在<br>–&gt; 验证[‘upload_file’]的content-type是否合法（可以抓包修改）<br>–&gt; 判断POST参数是否为空定义$file变量（关键：构造数组绕过下一步的判断）<br>–&gt;判断file不是数组则使用explode(‘.’, strtolower($file))对file进行切割，将file变为一个数组<br>–&gt; 判断数组最后一个元素是否合法<br>–&gt; 数组第一位和$file[count($file) - 1]进行拼接，产生保存文件名file_name<br>–&gt; 上传文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">explode(separator,string[,limit]) 函数，使用一个字符串分割另一个字符串，并返回由字符串组成的数组。</span><br><span class="line">end(array)函数，输出数组中的当前元素和最后一个元素的值。</span><br><span class="line">reset(array)函数，把数组的内部指针指向第一个元素，并返回这个元素的值</span><br><span class="line">count(array)函数，计算数组中的单元数目，或对象中的属性个数</span><br></pre></td></tr></table></figure>
+<p>先上传一句话木马，并用bp抓包<br><img src="/images/upload/21-1.jpg" alt="1"><br>修改后放包，上传成功<br><img src="/images/upload/21-2.jpg" alt="1"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/12/03/%E6%9C%89%E5%85%B3%E8%BF%87%E6%BB%A4%E7%9A%84%E7%BB%95%E8%BF%87/" rel="prev" title="绕过过滤">
+      <i class="fa fa-chevron-left"></i> 绕过过滤
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/03/30/cookie/" rel="next" title="cookie">
+      cookie <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-1"><span class="nav-number">1.</span> <span class="nav-text">Pass-1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%951"><span class="nav-number">1.1.</span> <span class="nav-text">方法1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%952"><span class="nav-number">1.2.</span> <span class="nav-text">方法2</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-2"><span class="nav-number">2.</span> <span class="nav-text">Pass-2</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%951-1"><span class="nav-number">2.1.</span> <span class="nav-text">方法1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%952-1"><span class="nav-number">2.2.</span> <span class="nav-text">方法2</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-3"><span class="nav-number">3.</span> <span class="nav-text">Pass-3</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%951-2"><span class="nav-number">3.1.</span> <span class="nav-text">方法1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%952-2"><span class="nav-number">3.2.</span> <span class="nav-text">方法2</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-4"><span class="nav-number">4.</span> <span class="nav-text">Pass-4</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%951-3"><span class="nav-number">4.1.</span> <span class="nav-text">方法1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%952-3"><span class="nav-number">4.2.</span> <span class="nav-text">方法2</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-5"><span class="nav-number">5.</span> <span class="nav-text">Pass-5</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%951-4"><span class="nav-number">5.1.</span> <span class="nav-text">方法1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%952-4"><span class="nav-number">5.2.</span> <span class="nav-text">方法2</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-6"><span class="nav-number">6.</span> <span class="nav-text">Pass-6</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-7"><span class="nav-number">7.</span> <span class="nav-text">Pass-7</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-8"><span class="nav-number">8.</span> <span class="nav-text">Pass-8</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-9"><span class="nav-number">9.</span> <span class="nav-text">Pass-9</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-10"><span class="nav-number">10.</span> <span class="nav-text">Pass-10</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-11"><span class="nav-number">11.</span> <span class="nav-text">Pass-11</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-12"><span class="nav-number">12.</span> <span class="nav-text">Pass-12</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-13"><span class="nav-number">13.</span> <span class="nav-text">Pass-13</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-14"><span class="nav-number">14.</span> <span class="nav-text">Pass-14</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-15"><span class="nav-number">15.</span> <span class="nav-text">Pass-15</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-16"><span class="nav-number">16.</span> <span class="nav-text">Pass-16</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-17"><span class="nav-number">17.</span> <span class="nav-text">Pass-17</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-18"><span class="nav-number">18.</span> <span class="nav-text">Pass-18</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-19"><span class="nav-number">19.</span> <span class="nav-text">Pass-19</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-20"><span class="nav-number">20.</span> <span class="nav-text">Pass-20</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pass-21"><span class="nav-number">21.</span> <span class="nav-text">Pass-21</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lwq</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lwq</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
