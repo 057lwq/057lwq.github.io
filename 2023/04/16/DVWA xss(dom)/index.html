@@ -20,18 +20,20 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="简介跨站点脚本（XSS）攻击是一种注入攻击，恶意脚本会被注入到可信的网站中。当攻击者使用 web 应用程序将恶意代码（通常以浏览器端脚本的形式）发送给其他最终用户时，就会发生 XSS 攻击。允许这些攻击成功的漏洞很多，并且在 web 应用程序的任何地方都有可能发生，这些漏洞会在使用用户的输入，没有对其进行验证或编码。攻击者可以使用 XSS 向不知情的用户发送恶意脚本，用户的浏览器并不知道脚本不应该">
+  <meta name="description" content="简介跨站点脚本（XSS）攻击是一种注入攻击，恶意脚本会被注入到可信的网站中。当攻击者使用 web 应用程序将恶意代码（通常以浏览器端脚本的形式）发送给其他最终用户时，就会发生 XSS 攻击。允许这些攻击成功的漏洞很多，并且在 web 应用程序的任何地方都有可能发生，这些漏洞会在使用用户的输入，没有对其进行验证或编码。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="DVWA xss(dom)">
 <meta property="og:url" content="http://example.com/2023/04/16/DVWA%20xss(dom)/index.html">
 <meta property="og:site_name" content="057lwq&#39;s Blog">
-<meta property="og:description" content="简介跨站点脚本（XSS）攻击是一种注入攻击，恶意脚本会被注入到可信的网站中。当攻击者使用 web 应用程序将恶意代码（通常以浏览器端脚本的形式）发送给其他最终用户时，就会发生 XSS 攻击。允许这些攻击成功的漏洞很多，并且在 web 应用程序的任何地方都有可能发生，这些漏洞会在使用用户的输入，没有对其进行验证或编码。攻击者可以使用 XSS 向不知情的用户发送恶意脚本，用户的浏览器并不知道脚本不应该">
+<meta property="og:description" content="简介跨站点脚本（XSS）攻击是一种注入攻击，恶意脚本会被注入到可信的网站中。当攻击者使用 web 应用程序将恶意代码（通常以浏览器端脚本的形式）发送给其他最终用户时，就会发生 XSS 攻击。允许这些攻击成功的漏洞很多，并且在 web 应用程序的任何地方都有可能发生，这些漏洞会在使用用户的输入，没有对其进行验证或编码。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/images/DVWA/9-1.png">
 <meta property="og:image" content="http://example.com/images/DVWA/9-2.png">
 <meta property="og:image" content="http://example.com/images/DVWA/9-3.png">
+<meta property="og:image" content="http://example.com/images/DVWA/9-4.png">
+<meta property="og:image" content="http://example.com/images/DVWA/9-5.png">
 <meta property="article:published_time" content="2023-04-16T14:52:02.000Z">
-<meta property="article:modified_time" content="2023-04-18T15:40:15.676Z">
+<meta property="article:modified_time" content="2023-07-09T03:24:59.839Z">
 <meta property="article:author" content="lwq">
 <meta property="article:tag" content="DVWA">
 <meta name="twitter:card" content="summary">
@@ -195,7 +197,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-18 23:40:15" itemprop="dateModified" datetime="2023-04-18T23:40:15+08:00">2023-04-18</time>
+                <time title="修改时间：2023-07-09 11:24:59" itemprop="dateModified" datetime="2023-07-09T11:24:59+08:00">2023-07-09</time>
               </span>
 
           
@@ -209,10 +211,24 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>跨站点脚本（XSS）攻击是一种注入攻击，恶意脚本会被注入到可信的网站中。当攻击者使用 web 应用程序将恶意代码（通常以浏览器端脚本的形式）发送给其他最终用户时，就会发生 XSS 攻击。允许这些攻击成功的漏洞很多，并且在 web 应用程序的任何地方都有可能发生，这些漏洞会在使用用户的输入，没有对其进行验证或编码。<br>攻击者可以使用 XSS 向不知情的用户发送恶意脚本，用户的浏览器并不知道脚本不应该被信任，并将执行 JavaScript。因为它认为脚本来自可信来源，所以恶意脚本可以访问浏览器并作用于该站点的任何 cookie、会话令牌或其他敏感信息，甚至可以重写 HTML 页面的内容。</p>
-<p>基于 DOM 的 XSS 是一种特殊的反射型 XSS，通过将 JavaScript 隐藏在 URL 中。基于 DOM 的 XSS 将在页面呈现时被 JavaScript 拉出，而不是在服务时嵌入到页面中。这会使它比其他攻击更隐蔽，WAF 或其他保护读取页面正文时看不到任何恶意内容。在另一个用户的浏览器中运行你自己的 JavaScript，用它窃取登录用户的 cookie。</p>
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>跨站点脚本（XSS）攻击是一种注入攻击，恶意脚本会被注入到可信的网站中。当攻击者使用 web 应用程序将恶意代码（通常以浏览器端脚本的形式）发送给其他最终用户时，就会发生 XSS 攻击。允许这些攻击成功的漏洞很多，并且在 web 应用程序的任何地方都有可能发生，这些漏洞会在使用用户的输入，没有对其进行验证或编码。</p>
 <span id="more"></span>
-<h1 id="Low"><a href="#Low" class="headerlink" title="Low"></a>Low</h1><p>查看网页源码，可以看到以下框中的JS代码，从URL栏中获取default参数的值，这里是通过获取“default&#x3D;”后面的字符串来实现的，然后直接写到option标签中，并没有对特殊字符进行任何的过滤：<br><img src="/images/DVWA/9-1.png" alt="1"><br>HTML DOM 有个 alert() 方法，用于显示带有一条指定消息和一个 OK 按钮的警告框。document.cookie 里面可以读到 cookie 信息，我们可以把 cookie 放在一个 alert() 生成的警告框中，回显时就会得到我们想要的信息了。<br>所以我们直接在url栏写入xss语句<code>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code><br><img src="/images/DVWA/9-2.png" alt="1"><br><img src="/images/DVWA/9-3.png" alt="1"><br>若要尝试使用其他XSS payload，如img、svg等标签，因为select标签内只允许内嵌option标签，而option标签中能内嵌script标签但不能内嵌img等标签，因此需要在注入时先闭合option和select标签从而使注入的标签逃逸出来执行XSS：<br><code>&lt;/option&gt;&lt;/select&gt;&lt;img src=x οnerrοr=alert(&quot;SKI12&quot;)&gt;</code></p>
+
+<p>攻击者可以使用 XSS 向不知情的用户发送恶意脚本，用户的浏览器并不知道脚本不应该被信任，并将执行 JavaScript。因为它认为脚本来自可信来源，所以恶意脚本可以访问浏览器并作用于该站点的任何 cookie、会话令牌或其他敏感信息，甚至可以重写 HTML 页面的内容。</p>
+<p>基于 DOM 的 XSS 是一种特殊的反射型 XSS，通过将 JavaScript 隐藏在 URL 中。基于 DOM 的 XSS 将在页面呈现时被 JavaScript 拉出，而不是在服务时嵌入到页面中。这会使它比其他攻击更隐蔽，WAF 或其他保护读取页面正文时看不到任何恶意内容。在另一个用户的浏览器中运行你自己的 JavaScript，用它窃取登录用户的 cookie。</p>
+<h1 id="Low"><a href="#Low" class="headerlink" title="Low"></a>Low</h1><p>查看网页源码，可以看到以下框中的JS代码，从URL栏中获取default参数的值，这里是通过获取“default&#x3D;”后面的字符串来实现的，然后直接写到option标签中，并没有对特殊字符进行任何的过滤：<br><img src="/images/DVWA/9-1.png" alt="1"><br>HTML DOM 有个 alert() 方法，用于显示带有一条指定消息和一个 OK 按钮的警告框。document.cookie 里面可以读到 cookie 信息，我们可以把 cookie 放在一个 alert() 生成的警告框中，回显时就会得到我们想要的信息了。<br>所以我们直接在url栏写入xss语句<br><code>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code><br><img src="/images/DVWA/9-2.png" alt="1"><br><img src="/images/DVWA/9-3.png" alt="1"><br>若要尝试使用其他XSS payload，如img、svg等标签，因为select标签内只允许内嵌option标签，而option标签中能内嵌script标签但不能内嵌img等标签，因此需要在注入时先闭合option和select标签从而使注入的标签逃逸出来执行XSS：<br><code>English&lt;/option&gt;&lt;/select&gt;&lt;img src=x οnerrοr=alert(&quot;SKI12&quot;)&gt;</code></p>
+<h1 id="Medium"><a href="#Medium" class="headerlink" title="Medium"></a>Medium</h1><p>HTML 的 &lt; img &gt; 标签定义 HTML 页面中的图像，该标签支持 onerror 事件，在装载文档或图像的过程中如果发生了错误就会触发。使用这些内容构造出 payload 如下，因为我们没有图片可供载入，因此会出错从而触发 onerror 事件输出 cookie。<br><code>English&lt;/option&gt;&lt;/select&gt;&lt;img src = 1 onerror = alert(document.cookie)&gt;</code><br><img src="/images/DVWA/9-4.png" alt="1"><br>网页源码变成了<br><img src="/images/DVWA/9-5.png" alt="1"></p>
+<p>源码<br>前端代码不变，后端代码如下所示。array_key_exists() 函数检查某个数组中是否存在指定的键名，如果键名存在返回 true，键名不存在则返回 false。stripos(string,find,start) 函数查找字符串在另一字符串中第一次出现的位置（不区分大小写），header() 函数向客户端发送原始的 HTTP 报头。也就是说现在服务器通过一个模式匹配，过滤了 “script” 标签，我们就不能直接注入 JS 代码了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">// Is there any input?</span><br><span class="line">if ( array_key_exists( &quot;default&quot;, $_GET ) &amp;&amp; !is_null ($_GET[ &#x27;default&#x27; ]) ) &#123;</span><br><span class="line">    $default = $_GET[&#x27;default&#x27;];</span><br><span class="line">    # Do not allow script tags (不区分大小写)</span><br><span class="line">    if (stripos ($default, &quot;&lt;script&quot;) !== false) &#123;</span><br><span class="line">        header (&quot;location: ?default=English&quot;);</span><br><span class="line">        exit;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">?&gt; </span><br></pre></td></tr></table></figure>
+
+<h1 id="High"><a href="#High" class="headerlink" title="High"></a>High</h1><p>前端代码不变，后端代码如下所示。服务器设置了白名单，default 参数只接受 French，English，German 以及 Spanish 这几个单词。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">// Is there any input?</span><br><span class="line">if (array_key_exists(&quot;default&quot;, $_GET) &amp;&amp; !is_null ($_GET[&#x27;default&#x27;]))&#123;</span><br><span class="line"></span><br><span class="line">    # White list the allowable languages</span><br><span class="line">    switch ($_GET[&#x27;default&#x27;])&#123;</span><br><span class="line">        case &quot;French&quot;:</span><br><span class="line">        case &quot;English&quot;:</span><br><span class="line">        case &quot;German&quot;:</span><br><span class="line">        case &quot;Spanish&quot;:</span><br><span class="line">            # ok</span><br><span class="line">            break;</span><br><span class="line">        default:</span><br><span class="line">            header (&quot;location: ?default=English&quot;);</span><br><span class="line">            exit;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">?&gt; </span><br></pre></td></tr></table></figure>
+<p>可以在注入的 payload 中加入注释符 “#”，注释后边的内容不会发送到服务端，但是会被前端代码所执行。<br><code>English #&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code></p>
+<h1 id="Impossible"><a href="#Impossible" class="headerlink" title="Impossible"></a>Impossible</h1><p>查看源码发现浏览器会先对url进行编码，然后直接赋值给option标签</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">if (document.location.href.indexOf(&quot;default=&quot;) &gt;= 0) &#123;</span><br><span class="line">    var lang = document.location.href.substring(document.location.href.indexOf(&quot;default=&quot;) + 8);</span><br><span class="line">    document.write(&quot;&lt;option value=&#x27;&quot; + lang + &quot;&#x27;&gt;&quot; + (lang) + &quot;&lt;/option&gt;&quot;);</span><br><span class="line">    document.write(&quot;&lt;option value=&#x27;&#x27; disabled=&#x27;disabled&#x27;&gt;----&lt;/option&gt;&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">document.write(&quot;&lt;option value=&#x27;English&#x27;&gt;English&lt;/option&gt;&quot;);</span><br><span class="line">document.write(&quot;&lt;option value=&#x27;French&#x27;&gt;French&lt;/option&gt;&quot;);</span><br><span class="line">document.write(&quot;&lt;option value=&#x27;Spanish&#x27;&gt;Spanish&lt;/option&gt;&quot;);</span><br><span class="line">document.write(&quot;&lt;option value=&#x27;German&#x27;&gt;German&lt;/option&gt;&quot;);</span><br></pre></td></tr></table></figure>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>当网页被浏览器请求是，浏览器会为页面创建一个顶级的 Document object 文档对象，然后生成各个子文档的对象，每个页面都会对应一个文档对象，每个文档对象都包含属性、方法和事件。Document object 文档对象可以通过 JavaScript 脚本进行编辑，客户端可以通过 DOM 修改页面的内容，从而获取 DOM 中的数据在本地执行。由于这个漏洞存在于前端，因此 DOM 型 XSS 漏洞不需要和服务器交互。<br>XSS 的攻击方式为攻击者请求一个带有 payload 的 URL，服务器的响应不会以任何形式包含攻击者的脚本。当时当用户的浏览器处理这个响应时，DOM 对象就会处理 XSS 代码。XSS 漏洞的修复方式有以下 2 种：</p>
+<p>过滤输入的字符，例如 “ ‘ ”，“ “ ”，“&lt;”，“&gt;” 等非法字符；<br>对输出到页面的数据进行编码。</p>
 
     </div>
 
@@ -234,7 +250,10 @@
     <a href="/2023/04/16/WeakSessionIDs/" rel="prev" title="Weak Session IDs">
       <i class="fa fa-chevron-left"></i> Weak Session IDs
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2023/04/17/DVWA%20xss(reflected)/" rel="next" title="DVWA xss(reflected)">
+      DVWA xss(reflected) <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -293,7 +312,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Low"><span class="nav-number">2.</span> <span class="nav-text">Low</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Low"><span class="nav-number">2.</span> <span class="nav-text">Low</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Medium"><span class="nav-number">3.</span> <span class="nav-text">Medium</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#High"><span class="nav-number">4.</span> <span class="nav-text">High</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Impossible"><span class="nav-number">5.</span> <span class="nav-text">Impossible</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -307,7 +326,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-count">21</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

